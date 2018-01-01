@@ -1,0 +1,7 @@
+{
+    "config":{
+	"dsn":"dbi:mysql:database=ognrange;host=localhost;port=3306",
+	"dbusername":"ognwriter",
+	"dbpassword":"aqwoekdjababqhejek"
+    }
+}

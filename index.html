@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../assets/ico/favicon.ico">
+
+    <title>Open Glider Network Range Tool</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="/files/bootstrap/bootstrap.colorpickersliders.css" rel="stylesheet">
+    <link href="/files/style.css" rel="stylesheet">
+
+    <style>
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=false&libraries=visualization,geometry"></script>
+    <script src="files/mgrs.min.js"></script>
+    <script src="files/maptiles2.js"></script>
+    <script src="files/heatmap2.js"></script>
+    <script>
+      google.maps.event.addDomListener(window, 'load', setup );
+    </script>
+  </head>
+
+  <body>
+
+    <!-- Static navbar -->
+    <div class="navbar navbar-default navbar-static-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Open Glider Network Range</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+
+	    <form class="navbar-form navbar-right" role="search">
+              <div class="form-group stationlist">
+		<input type="text" id="typeahead" class="form-control" placeholder="Showing All, Choose" />
+              </div>
+              <button type="submit" class="btn" onclick="getStationData($('#typeahead').val())">Goto</button>
+              <button type="submit" class="btn btn-default" onclick="getStationData('');">Show All</button>
+
+	      <div class="btn-group nav ">
+		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+		  When <span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu" role="menu">
+		  <li><a href="#" onclick="return setToday()" id="today"><span class=""></span> Today</a></li>
+		  <li><a href="#" onclick="return setLastWeek()" id="lastweek"><span class=""></span> Last 7 Days</a></li>
+		  <li><a href="#" onclick="return setDays(30)" id="d30"><span class=""></span> Last 30 Days</a></li>
+		  <li><a href="#" onclick="return setDays(60)" id="d60"><span class=""></span> Last 60 Days</a></li>
+		  <li><a href="#" onclick="return setAll()" id="all"><span class="glyphicon glyphicon-ok"></span> Since 31/03/2015 (V6 Air Protocol)</a></li>
+		</ul>
+	      </div>
+
+	      <div class="btn-group nav ">
+		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+		  What <span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu" role="menu">
+		  <li><a href="#" onclick="return setMaxStrength()" id="max"><span class="glyphicon glyphicon-ok"></span> Maximum Signal Strength</a></li>
+		  <li><a href="#" onclick="return setAvgStrength()" id="average"><span class=""></span> Average Signal Strength</a></li>
+		  <li><a href="#" onclick="return setSiteCount()" id="receivers"><span class=""></span> Number of Receivers</a></li>
+		  <li><a href="#" onclick="return setCoverage()" id="coverage"><span class=""></span> Likely Coverage (Based on Up Receivers)</a></li>
+		  <li><a href="#" onclick="return setLowResCoverage()" id="lowres-coverage"><span class=""></span> Likely Coverage (All Receivers - LowRes)</a></li>
+		  <li><a href="#" onclick="return setSampleCount()" id="samples"><span class=""></span> Number of Samples</a></li>
+		  <li><a href="#" onclick="return setLowest()" id="lowest"><span class=""></span> Lowest Height</a></li>
+		</ul>
+	      </div>
+
+	      <div class="btn-group nav ">
+		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+		  Options <span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu" role="menu">
+		  <li><a href="#" onclick="return toggleCircles()" id="circles"><span class="glyphicon glyphicon-ok"></span> Show 10km circles</a></li>
+		  <li><a href="#" onclick="return toggleAmbiguity()" id="ambiguity"><span class=""></span> Show ambiguity squares</a></li>
+		  <li><a href="#" onclick="return toggleAirspace()" id="airspace"><span class=""></span> Show airspace</a></li>
+		  <li class="divider"></li>
+		  <li class="dropdown-submenu pull-left">
+		    <a href="#">Minimum Value Colour</a>
+		    <ul class="dropdown-menu pull-left">
+		      <li class="dropdown-submenu"><div id="minc"></div></li>
+		    </ul>
+		  </li>
+		  <li class="dropdown-submenu pull-left">
+		    <a href="#">Maximum Value Colour</a>
+		    <ul class="dropdown-menu">
+		      <li class="dropdown-submenu"><div id="maxc"></div></li>
+		    </ul>
+		  </li>
+		</ul>
+	      </div>
+	    </form> 
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+
+    <div style="width:100%; height: 100%; margin: 0px">
+	<div id="description" style="text-align: center"></div>
+	<div id="map-canvas"></div>
+<!--      </div> -->
+    </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Tools Used</h4>
+        </div>
+        <div class="modal-body">
+          <ul>
+	    <li>Perl - data collection</li>
+	    <li><a href="http://search.cpan.org/dist/Ham-APRS-FAP/">Ham-APRS-FAP</a> - APRS server connection and packet parsing</li>
+	    <li><a href="http://www.learningDSLRVideo.com" target="_blank">Dave Dugdale</a> - Wine glass picture :)</li>
+	    <li>BootStrap - lazy headers</li>
+	    <li>jQuery - lots of clever stuff</li>
+	  </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+
+    <div class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+	<a href="http://wiki.glidernet.org">Data from the Open Glider Network</a><br/>
+	Copyright (c) 2014, <a href="http://www.temeletry.co.uk">Temeletry Ltd</a>,<a data-toggle="modal" href="#myModal">Credits</a>
+	  <div class="sponsor">
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_xclick">
+<input type="hidden" name="quantity" value="1"/>
+<input type="hidden" name="undefined_quantity" value="1"/>
+<input type="hidden" name="currency_code" value="GBP">
+<input type="hidden" name="business" value="melissa-paypal@temeletry.co.uk"/>
+<input type="hidden" name="amount" value="2.50"/>
+<input type="hidden" name="item_name" value="Small Glass"/>
+<input type="hidden" name="item_number" value="beta"/>
+<input type="image" src="/files/WineButton.png" border="0" name="submit" alt="" style="width:250px; height:25px">
+<img alt="" border="0" src="https://www.paypalobjects.com/en_GB/i/scr/pixel.gif" width="1" height="1">
+</form>
+	</div>
+	<span id="zoom_msg"><b>Zoom in to see coverage information</b></span>
+	</div>
+	<div class="navbar-right navbar-header" id="details" style="display:none;"></div>
+      </div>
+    </div>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/files/bootstrap/typeahead.bundle.js"></script>
+    <script src="/files/tinycolor.js"></script>
+    <script src="/files/bootstrap/bootstrap.colorpickersliders.nocielch.js"></script>
+    <script>
+
+    </script>
+  </body>
+</html>
