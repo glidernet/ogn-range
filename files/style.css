@@ -1,36 +1,12 @@
-/*
-Copyright (c) 2014-2017, Melissa Jenkins
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * The names of its contributors may not be used to endorse or promote products
-      derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL MELISSA JENKINS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
-#map-canvas {
-    width: 100%; height: 500px; 
-    margin: 0px;
-    padding: 0px
+#map_canvas {
+  width: 100%; 
+  height: 100%; 
+  margin: 0px;
+  padding: 0px;
 }
 i.subtle {
-    color: #888;
+  color: #888;
 }
 
 .dropdown-submenu{position:relative;}
@@ -77,3 +53,77 @@ i.subtle {
   outline: 0;
   background-color: #428bca;
 }
+.tooltip {
+  position: relative;
+  padding: 3px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  opacity: 0.7;
+  white-space: nowrap;
+  font: 10pt sans-serif;
+}
+
+.ol-zoom {
+	left: 50%;
+	top: 0px;
+}
+
+.ol-control button {
+	float: left
+}
+
+.ol-rotate {
+	visibility: hidden;
+}
+
+.l-outer-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.l-table {
+    display: table;
+}
+
+.l-table-row {
+    display: table-row;
+}
+
+.l-table-cell {
+    display: table-cell;
+}
+
+.l-container {
+    width: 100%;
+    height: 100%;
+	padding-left : 0px;
+	padding-right : 0px;
+}
+
+.l-body-content-outer-wrapper {
+    height: 100%;
+}
+
+.l-body-content-inner-wrapper {
+    height: 100%;
+    position: relative;
+    overflow: auto;
+}
+
+.l-body-content {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.l-smaller {
+ margin-right: 0px; 
+ margin-bottom: 0px; 
+ margin-top: 0px; 
+ padding: 5px 5px";
+ }
