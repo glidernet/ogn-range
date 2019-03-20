@@ -12,10 +12,10 @@ sudo a2enmod cache
 sudo a2enmod cache_disk
 sudo adduser ognrange
 cd /var/www/html/OGNRANGE
-chown -R ognrange:ognrange .
-chmod -R 750 .
+chown -R ognrange:adm .
+chmod -R 771 .
 chgrp www-data files/* perl/* index.html config/webconfig.json
-chmod 751 files perl config
+chmod 771 files perl config
 #
 # change the URL on index.html & files/maptiles2.js
 #
