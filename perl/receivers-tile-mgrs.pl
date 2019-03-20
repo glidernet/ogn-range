@@ -69,7 +69,7 @@ if( param ) {
 	print "database problem". $DBI::errstr;
 	exit;
     }
-    $db->do( 'SET time_zone = "GMT"' );
+    $db->do( 'SET time_zone = "+00:00"' );
 
     my $sth;
     $sth =  $db->prepare( 'select ref, count(distinct station) from positions_mgrs '.

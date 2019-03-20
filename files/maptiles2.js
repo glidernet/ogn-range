@@ -156,7 +156,7 @@ CoverageMapType.prototype.canvasFunctionCoverage = function(
       cache[cacheKey] = [ plotRef ];
 
       $.ajax({   type: "GET",
-        url: "//flarmrange.onglide.com/perl/"+source+"-tile-mgrs.pl",
+        url: "//repoogn.ddns.net:60080/OGNRANGE/perl/"+source+"-tile-mgrs.pl",
         data: { station: station, start: start, end: end, squares: tile},
         timeout:20000,
         cache: true,

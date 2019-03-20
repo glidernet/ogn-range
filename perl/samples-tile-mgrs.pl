@@ -69,7 +69,7 @@ if( param ) {
 	print "database problem". $DBI::errstr;
 	exit;
     }
-    $db->do( 'SET time_zone = "GMT"' );
+    $db->do( 'SET time_zone = "+00:00"' );
 
     my $sth;
     if( $station eq '' ) {

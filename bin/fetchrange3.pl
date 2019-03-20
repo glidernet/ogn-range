@@ -81,6 +81,7 @@ my @servers = ( 'glidern1.glidernet.org:10153',
 		'glidern2.glidernet.org:10153', 
 		'glidern3.glidernet.org:10153', 
 		'glidern4.glidernet.org:10153', 
+		'glidern5.glidernet.org:10153', 
 		'aprs.glidernet.org:10152' );
 #		'glidern2.glidernet.org:10152');
 #		'aprs.glidernet.org:10152' );
@@ -148,7 +149,7 @@ sub handleServer {
     if( ! $db ) {
 	die "database problem". $DBI::errstr;
     }
-    $db->do( 'SET time_zone = "GMT"' );
+    $db->do( 'SET time_zone = "+00:00"' );
 
 
     my $sth_mgrs = $db->prepare( 'insert into positions_mgrs values ( left(now(),10), ?, ?, ?, ?, ?, 1 ) on '.
@@ -164,7 +165,7 @@ sub handleServer {
     my $sth_history =  $db->prepare( 'insert into history values ( now(), ?, ?, ? )' );
 
     print "connecting to server $server\n";
-    my $is = new Ham::APRS::IS( $server, 'OGR', 'appid' => 'ognrange.onglide.com 0.3.1');
+    my $is = new Ham::APRS::IS( $server, 'OGR', 'appid' => 'ognrange.glidernet.org 0.4.0');
     
 
     open( OUT, ">>", "/dev/null" );
@@ -184,7 +185,7 @@ sub handleServer {
 	    # make sure we send a keep alive every 90 seconds or so
 	    my $now = time();
 	    if( $now - $lastkeepalive > 60 ) {
-		$is->sendline('# flarmrange.onglide.com 212.13.204.217');
+		$is->sendline('# ognrange.glidernet.org 212.13.204.217');
 		$lastkeepalive = $now;
 	    }
 	    
@@ -429,7 +430,7 @@ sub handleAvailablity {
     if( ! $db ) {
 	die "database problem". $DBI::errstr;
     }
-    $db->do( 'SET time_zone = "GMT"' );
+    $db->do( 'SET time_zone = "+00:00"' );
     
     my $sth_sids = $db->prepare( 'select station, id from stations' ); $sth_sids->execute();
     my $sth_gids = $db->prepare( 'select glider_id, callsign from gliders' ); $sth_gids->execute();
@@ -606,11 +607,25 @@ sub processStationDetailsBeacon {
     my $st_station_ver = $db->prepare( 'insert into stationlocation (time, station, version) values ( left(now(),10), ?,? ) on duplicate key update version=values(version)' );
 
     # qAC seems to be the beacons
-    my $cpu = undef; my $ppm = 0; my $dbadj = 0; my $temp = -273;
+    my $cpu = 0; my $ppm = 0; my $dbadj = 0; my $temp = -273;
     my $version = '?';
-    
+    if ($callsign =~ /FNB*/ )
+    	{
+	return;
+	}
+
+    if ($callsign =~ /XCG*/)
+    	{
+	return;
+	}
+
     if( $comment =~ /v([0-9.]+[A-Z0-9a-z-]*)/ ) {
 	$version = $1;
+    }
+    
+    if( $comment =~ /PilotAware/ ) {
+	$version = 0;
+	return;
     }
     
     if( $comment =~ /CPU:([0-9.]+) / ) {
