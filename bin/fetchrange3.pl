@@ -364,7 +364,13 @@ sub handleServer {
 	    }
 	    else {
 		print "\n$server: --- bad packet --> \"$l\"\n";
-		warn "Parsing failed: $packetdata{resultmsg} ($packetdata{resultcode})\n";
+		if ($l =~ 'RND') {
+			print "Ignore RND pacakets"
+		}
+		else {
+			warn "Parsing failed: $packetdata{resultmsg} ($packetdata{resultcode}) <==== \n";
+			warn "\n$server: --- bad packet --> \"$l\"\n";
+		}
 	    }
 	}
 	print "\nreconnecting\n";
@@ -376,7 +382,13 @@ sub handleServer {
 sub getStation {
     my($sth_add,$sth_history,$sth_supdate,$station) = @_;
     my $s_id = undef;
+    if ($station eq 'SPOT' || $station eq 'SPIDER' || $station eq 'INREACH' || $station eq "FLYMASTER" || $station eq 'NAVITER' || $station eq 'CAPTURS' || $station eq 'LT24' || $station eq 'SKYLINES') {
+	    return 0;
+    }
 
+    if ($station =~ /FNB*/ || $station =~ /XCG*/ ) {
+	    return 0;
+    }
 
     # figure out how it's going into the database
     {
@@ -523,8 +535,12 @@ sub handleAvailablity {
 	
 	# add up how many contacts each glider had
 	foreach my $station( values %pstats ) {
-	    $sth_stats->execute(  $timestamp, $station->{station}, $station->{positions}, $station->{gliders}, $station->{crc}, 0, int(($station->{cpu}||0)*10), int($station->{temp}) );
-	    $sth_statssummary->execute(  $station->{station}, $timestamp, $station->{positions}, $station->{gliders}, $station->{crc}, 0, int(($station->{cpu}||0)*10), int($station->{temp}) );
+	    my $temper = 1;
+	    if  (int($station->{temp}) <99)  {
+		    $temper=int($station->{temp});
+		    }
+	    $sth_stats->execute       (  $timestamp, $station->{station}, $station->{positions}, $station->{gliders}, $station->{crc}, 0, int(($station->{cpu}||0)*10), $temper );
+	    $sth_statssummary->execute(  $station->{station}, $timestamp, $station->{positions}, $station->{gliders}, $station->{crc}, 0, int(($station->{cpu}||0)*10), $temper );
 	}
 
 	my $now = time();
@@ -607,7 +623,7 @@ sub processStationDetailsBeacon {
     my $st_station_ver = $db->prepare( 'insert into stationlocation (time, station, version) values ( left(now(),10), ?,? ) on duplicate key update version=values(version)' );
 
     # qAC seems to be the beacons
-    my $cpu = 0; my $ppm = 0; my $dbadj = 0; my $temp = -273;
+    my $cpu = 0; my $ppm = 0; my $dbadj = 0; my $temp = 1;
     my $version = '?';
     if ($callsign =~ /FNB*/ )
     	{
