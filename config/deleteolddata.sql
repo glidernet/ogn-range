@@ -5,3 +5,5 @@ SELECT count(*) FROM `positions_mgrs` WHERE `time` < '2018-01-01';
 DELETE FROM `positions_mgrs` WHERE `time` < '2018-01-01';
 SELECT count(*) FROM `history` WHERE time <'2018-01-01';
 DELETE FROM `history` WHERE time <'2018-01-01';
+SELECT count(*) FROM `stats` WHERE time <'2018-01-01';
+DELETE FROM `stats` WHERE time <'2018-01-01';
