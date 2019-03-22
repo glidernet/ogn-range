@@ -1,6 +1,7 @@
+drop   database ognrange;
 create database ognrange;
 use ognrange;
-source config/schema.sql ;
+source OGNrange.sql ;
 create user ognrange@localhost identified by 'aksdkqre912eqwkadkad';
 grant select on ognrange.* to ognrange@localhost ;
 create user ognwriter@localhost identified by 'aksdkqre912eqwkadkad';
