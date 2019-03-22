@@ -62,6 +62,17 @@ my $json_text = do {
     <$json_fh>
 };
 
+use Sys::Hostname;
+my $host = hostname();
+use Sys::Hostname::Long 'hostname_long';
+my $hostname = hostname_long();
+use Socket;
+my $address = inet_ntoa(
+        	scalar gethostbyname( $host || 'localhost' )
+    );
+warn "\n === $host === \n";
+warn "\n === $hostname === \n";
+warn "\n === $address === \n";
 my $json = JSON->new;
 my $data = $json->decode($json_text);
 
@@ -195,6 +206,8 @@ sub handleServer {
 		%stations_loc = (); %stations_ver = ();
 		print "resetting stations for change of date";
 		print OUT "\n--------------- $today ---------------\n";
+		warn      "\n--------------- $today ---------------\n";
+		warn      "\n--------------- $now   ---------------\n";
 
 		# hide old stations so they don't linger forever
 		$db->do( "create temporary table z as select sl.station, datediff(now(),max(sl.time)) a, least(greatest(5,count(sl.time)*2),21) b from stationlocation sl group by 1 having a > b" );
@@ -206,6 +219,7 @@ sub handleServer {
 		$db->do ( "insert into estimatedcoverage select station, ref, avg(strength) s,sum(count) c from positions_mgrs p group by station, ref having (s > 75 and c > 20) or s > 105" );
 		$db->do ( "truncate roughcoverage " );
 		$db->do ( "insert into roughcoverage select station, concat(left(ref,6),mid(ref,8,1)) r, avg(strength) s,sum(count) c from positions_mgrs p group by station, r " );
+		warn      "\n--------------- $now   ---------------\n";
 	    }
 
 	    
@@ -275,7 +289,7 @@ sub handleServer {
 				    my $reduced = ($1||'0'); $reduced .= $2.$3;
 
 				    # and store the record in the db
-				    $sth_mgrs->execute( $s_id, $reduced, $strength, $height, $height );
+				    $sth_mgrs->execute( $s_id, $reduced, $strength, $height, $height ) or die "Can't execute statement: $DBI::errstr";;
 
 				    if( $full ) {
 					print "DUP: $s_callsign $s_id ($v1) lt='$lt_r' and lg='$lg_r'\n";
@@ -395,17 +409,17 @@ sub getStation {
 	lock(%station_id);
 	if( ! ($s_id = $station_id{lc $station}) ) {
 
-	    $sth_add->execute( $station );
+	    $sth_add->execute( $station ) or die "Can't execute statement: $DBI::errstr";;
 	    $s_id = $sth_add->{mysql_insertid};
 	    $station_id{lc $station} = $s_id;
 	    $station_name{ lc $station } = $station;
 	    print "\nnew station $station => $s_id\n";
-	    $sth_history->execute( $s_id, 'new', "New station $station" );
+	    $sth_history->execute( $s_id, 'new', "New station $station" ) or die "Can't execute statement: $DBI::errstr";;
 	}
 	elsif( $sth_supdate && ($station_name{ lc $station }||$station) ne $station ) {
-	    $sth_supdate->execute( $station, $s_id );	
+	    $sth_supdate->execute( $station, $s_id ) or die "Can't execute statement: $DBI::errstr";;	
 	    print "\nrenamed station $station => $s_id\n";
-	    $sth_history->execute( $s_id, 'renamed', $station_name{ lc $station } . " now $station" );
+	    $sth_history->execute( $s_id, 'renamed', $station_name{ lc $station } . " now $station" ) or die "Can't execute statement: $DBI::errstr";;
 	    $station_name{ lc $station } = $station;
 	}
 	
@@ -425,7 +439,7 @@ sub getGlider {
 	lock(%glider_id);
 	if( ! ($s_id = $glider_id{uc $id}) ) {
 
-	    $sth_add->execute( $id );
+	    $sth_add->execute( $id ) or die "Can't execute statement: $DBI::errstr";;
 	    $s_id = $sth_add->{mysql_insertid};
 	    $glider_id{uc $id} = $s_id;
 	    print "\nnew glider $id => $s_id\n";
@@ -444,12 +458,12 @@ sub handleAvailablity {
     }
     $db->do( 'SET time_zone = "+00:00"' );
     
-    my $sth_sids = $db->prepare( 'select station, id from stations' ); $sth_sids->execute();
-    my $sth_gids = $db->prepare( 'select glider_id, callsign from gliders' ); $sth_gids->execute();
+    my $sth_sids = $db->prepare( 'select station, id from stations' ); $sth_sids->execute() or die "Can't execute statement: $DBI::errstr";;
+    my $sth_gids = $db->prepare( 'select glider_id, callsign from gliders' ); $sth_gids->execute() or die "Can't execute statement: $DBI::errstr";;
     my $sth = $db->prepare( 'insert into availability values ( ?, ?, ? ) on duplicate key update time = values(time), status = values(status)' );
     my $sth_active = $db->prepare( 'update stations set active="Y" where id = ? and active="N"' );
     my $sth_log = $db->prepare( 'insert into availability_log values ( ?, ?, ? )' );
-    my $sth_first = $db->prepare( 'select s.station, time from stations s, availability a where s.id = a.station_id and a.status = "U"' ); $sth_first->execute();
+    my $sth_first = $db->prepare( 'select s.station, time from stations s, availability a where s.id = a.station_id and a.status = "U"' ); $sth_first->execute() or die "Can't execute statement: $DBI::errstr";;
     my $sth_addstation = $db->prepare( 'insert into stations ( station ) values ( ? )' );
     my $sth_updatestation = $db->prepare( 'update stations set station = ? where id = ?' );
     my $sth_history =  $db->prepare( 'insert into history values ( now(), ?, ?, ? )' );
@@ -488,7 +502,7 @@ sub handleAvailablity {
 	sleep(600);
 
 	# get our timestamp, use db time
-	$sth_timestamp->execute();
+	$sth_timestamp->execute() or die "Can't execute statement: $DBI::errstr";;
 	my ($timestamp) = $sth_timestamp->fetchrow_array();
 
 	# copy and reset so we don't keep locked for long
@@ -539,8 +553,8 @@ sub handleAvailablity {
 	    if  (int($station->{temp}) <99)  {
 		    $temper=int($station->{temp});
 		    }
-	    $sth_stats->execute       (  $timestamp, $station->{station}, $station->{positions}, $station->{gliders}, $station->{crc}, 0, int(($station->{cpu}||0)*10), $temper );
-	    $sth_statssummary->execute(  $station->{station}, $timestamp, $station->{positions}, $station->{gliders}, $station->{crc}, 0, int(($station->{cpu}||0)*10), $temper );
+	    $sth_stats->execute       (  $timestamp, $station->{station}, $station->{positions}, $station->{gliders}, $station->{crc}, 0, int(($station->{cpu}||0)*10), $temper ) or die "Can't execute statement: $DBI::errstr";;
+	    $sth_statssummary->execute(  $station->{station}, $timestamp, $station->{positions}, $station->{gliders}, $station->{crc}, 0, int(($station->{cpu}||0)*10), $temper ) or die "Can't execute statement: $DBI::errstr";;
 	}
 
 	my $now = time();
@@ -554,14 +568,14 @@ sub handleAvailablity {
 	    print "$station [". ($station_packets{$station}||0)."]";
 	    # if we didn't have a previous status it's a new station
 	    if( ! ($station_previous_check{$station}||0) ) {
-		$sth_log->execute( $s_id, $last, 'U' );
+		$sth_log->execute( $s_id, $last, 'U' ) or die "Can't execute statement: $DBI::errstr";;
 		push( @missing, $station );
 		print " (logged UP)";
 	    }
 	    print ",";
 
-	    $sth->execute( $s_id, $last, 'U' );
-	    $sth_active->execute( $s_id );
+	    $sth->execute( $s_id, $last, 'U' ) or die "Can't execute statement: $DBI::errstr";;
+	    $sth_active->execute( $s_id ) or die "Can't execute statement: $DBI::errstr";;
 	}
 
 	print "done.\ndown: ";

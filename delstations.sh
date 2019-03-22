@@ -11,6 +11,12 @@ bash deletephantoms.sh SKYLINES
 bash deletephantoms.sh LT24
 bash deletephantoms.sh CAPTURS
 bash deletephantoms.sh RELAY
+bash deletephantoms.sh 0
+bash deletephantoms.sh Test
+bash deletephantoms.sh N0CALL
+bash deletephantoms.sh Home
+bash deletephantoms.sh MyStation
+bash deletephantoms.sh abcde
 #
 echo "deleting the pseudo STATIONS"
 #
