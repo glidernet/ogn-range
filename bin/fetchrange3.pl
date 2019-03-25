@@ -236,11 +236,11 @@ sub handleServer {
 	    # check to make sure we emit the stations at least once a day
 	    if( date($now) ne $today ) { 
 		$today = date($now);
-		if ($full) {
+		if ( ! $full) {			# only the aprs.glidernet.org thread !!!
 			%stations_loc = (); %stations_ver = ();
 			if ($prt) {print "resetting stations for change of date";}
 			print OUT "\n-------New date: -------- $today ---------------\n";
-			warn      "\n-------New date: -------- $today ---------------\n";
+			warn      "\n-------New date: -------- $server $today ---------------\n";
 			warn      "\n-------New date: -------- $now   ---------------\n";
 
 		# hide old stations so they don't linger forever
@@ -254,7 +254,7 @@ sub handleServer {
 			$db->do ( "truncate roughcoverage " );
 			$db->do ( "insert into roughcoverage select station, concat(left(ref,6),mid(ref,8,1)) r, avg(strength) s,sum(count) c from positions_mgrs p group by station, r " );
 	    		my $now = time();
-			warn      "\n--------------- $now   ---------------\n";
+			warn      "\n--------------- $server $now   ---------------\n";
 		}
 	    }
 
