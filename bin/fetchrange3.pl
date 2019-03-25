@@ -72,6 +72,7 @@ my $json_text = do {
 
 use Sys::Hostname;
 my $host = hostname();
+my $ppid = getppid();
 use Sys::Hostname::Long 'hostname_long';
 my $hostname = hostname_long();
 use Socket;
@@ -82,6 +83,7 @@ warn "\nOGN Range analyzer Version: $pgmversion \n";
 warn "Host === $host === \n";
 warn "Host === $hostname === \n";
 warn "IP addr === $address === \n";
+warn "ProcessID: $ppid  \n";
 warn "OSname: $Config{osname}\n";
 warn "OSname: $Config{archname}\n";
 # assure that not a copy of this program is running
