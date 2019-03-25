@@ -44,6 +44,7 @@ use Socket qw(SOL_SOCKET SO_RCVBUF);
 use IO::Socket::INET;
 use JSON;
 use Config;
+use Fcntl ':flock';
 # --------------------- #
 my $id = 'GLDDBF61';
 my %countries :shared;
@@ -77,12 +78,15 @@ use Socket;
 my $address = inet_ntoa(
         	scalar gethostbyname( $host || 'localhost' )
     );
-warn "\n OGN Range analyzer Version: $pgmversion \n";
+warn "\nOGN Range analyzer Version: $pgmversion \n";
 warn "Host === $host === \n";
 warn "Host === $hostname === \n";
 warn "IP addr === $address === \n";
 warn "OSname: $Config{osname}\n";
 warn "OSname: $Config{archname}\n";
+# assure that not a copy of this program is running
+open my $self, '<', $0         or die "Couldn't open self: $!";
+flock $self, LOCK_EX | LOCK_NB or die "This script OGNRANGE is already running";
 #warn "ProcessID $PID\n";
 #
 #Get the credential from the config file
