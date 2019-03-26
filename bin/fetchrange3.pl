@@ -200,10 +200,10 @@ sub handleServer {
 
 #    my $sth_crc = $db->prepare( 'insert into crc values ( now(), ?, ?, ?, ?, ?, ?, ?, ? );' );
     
-    my $sth_addstation = $db->prepare( 'insert into stations ( station ) values ( ? )' );
+    my $sth_addstation    = $db->prepare( 'insert into stations ( station ) values ( ? )' );
     my $sth_updatestation = $db->prepare( 'update stations set station = ? where id = ?' );
-    my $sth_addglider =  $db->prepare( 'insert into gliders ( callsign ) values ( ? )' );
-    my $sth_history =  $db->prepare( 'insert into history values ( now(), ?, ?, ? )' );
+    my $sth_addglider     = $db->prepare( 'insert into gliders ( callsign ) values ( ? )' );
+    my $sth_history       = $db->prepare( 'insert into history values ( now(), ?, ?, ? )' );
 
     my $name   =  "localhost";
     if ($server =~ /glider*/ )
@@ -231,7 +231,15 @@ sub handleServer {
 	if   ($is->connected()) {$is->sock()->setsockopt(SOL_SOCKET,SO_RCVBUF,256*1024);}
 	
 	while($is->connected()) {
-	    	    
+	   
+    	    if (not $db->ping()) {
+		$db->disconnect();
+    	    	$db = DBI->connect( $db_dsn, $db_username, $db_password );
+    		if( ! $db ) {
+        			die "database problem". $DBI::errstr;
+    		}
+    		$db->do( 'SET time_zone = "+00:00"' );	
+	    }		
 	    # make sure we send a keep alive every 90 seconds or so
 	    my $now = time();
 	    if( $now - $lastkeepalive > 60 ) {
@@ -682,6 +690,9 @@ sub processStationLocationBeacon {
     lock( %stations_loc );
     if( ($stations_loc{$callsign}||'') ne "$lt/$lg" ) {
 	my $c = '';#getCountry($lt,$lg)
+	if ($altitude > 9999) {
+		$altitude = 9999;
+	}
 	$st_station_loc->execute( $s_id, $lt, $lg, $altitude, $c );
 	if ($prt) {print "station $callsign location update to $lt, $lg ($c)\n";}
 	$stations_loc{$callsign} = "$lt/$lg";
