@@ -7,6 +7,6 @@ else
 	#               restart OGN data collector
     logger -t $0 "OGNrange Log seems down, restarting"
     date >>/nfs/OGN/DIRdata/log/.OGNrangerestart.log
-    bash ~/src/OGNrange.sh
+    bash ~/src/OGNrange.sh &
 fi
 

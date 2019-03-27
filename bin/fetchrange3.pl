@@ -188,7 +188,7 @@ sub handleServer {
 
     my $db = DBI->connect( $db_dsn, $db_username, $db_password );
     if( ! $db ) {
-	die "database problem". $DBI::errstr;
+	die "==> database problem serving: $server ". $DBI::errstr;
     }
     $db->do( 'SET time_zone = "+00:00"' );
 
@@ -234,9 +234,10 @@ sub handleServer {
 	   
     	    if (not $db->ping()) {
 		$db->disconnect();
+		warn "\n >>>> Reconnecting MySQL for server $server <<<<\n\n";
     	    	$db = DBI->connect( $db_dsn, $db_username, $db_password );
     		if( ! $db ) {
-        			die "database problem". $DBI::errstr;
+        			die "===> database problem serving $server ===>". $DBI::errstr;
     		}
     		$db->do( 'SET time_zone = "+00:00"' );	
 	    }		
@@ -253,6 +254,7 @@ sub handleServer {
 		if ( ! $full) {			# only the aprs.glidernet.org thread !!!
 			%stations_loc = (); %stations_ver = ();
 			if ($prt) {print "resetting stations for change of date";}
+			my $starttime=$now;
 			print OUT "\n-------New date: -------- $today ---------------\n";
 			warn      "\n-------New date: -------- $server $today ---------------\n";
 			warn      "\n-------New date: -------- $now   ---------------\n";
@@ -268,7 +270,8 @@ sub handleServer {
 			$db->do ( "truncate roughcoverage " );
 			$db->do ( "insert into roughcoverage select station, concat(left(ref,6),mid(ref,8,1)) r, avg(strength) s,sum(count) c from positions_mgrs p group by station, r " );
 	    		my $now = time();
-			warn      "\n--------------- $server $now   ---------------\n";
+			my $totaltime = $starttime - $now;
+			warn      "\n--------------- $server $now $totaltime  ---------------\n";
 		}
 	    }
 
