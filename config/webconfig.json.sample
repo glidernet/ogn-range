@@ -1,5 +1,6 @@
 {
     "config":{
+	"url":"http://yourserver.com",
 	"dsn":"dbi:mysql:database=ognrange;host=localhost;port=3306",
 	"dbusername":"ognrange",
 	"dbpassword":"aksdkqre912eqwkadkad"
