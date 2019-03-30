@@ -33,11 +33,11 @@ bash deleteFNB.sh      TEST
 #
 echo "deleting the data before January 2018"
 #
-mysql -u ognwriter -paksdkqre912eqwkadkad ognrange <config/deleteoldata.sql
+mysql --login-path=ognrange ognrange <config/deleteoldata.sql
 #
 echo "Check and optimize the ognrange database"
 #
-mysql        -e "reset query cache;"           -u ognwriter -paksdkqre912eqwkadkad ognrange
-mysqlcheck                                     -u ognwriter -paksdkqre912eqwkadkad ognrange
-mysql        -e "reset query cache;"           -u ognwriter -paksdkqre912eqwkadkad ognrange
-mysqlcheck --optimize --skip-write-binlog      -u ognwriter -paksdkqre912eqwkadkad ognrange
+mysql        -e "reset query cache;"           --login-path=ognrange ognrange
+mysqlcheck                                     --login-path=ognrange ognrange
+mysql        -e "reset query cache;"           --login-path=ognrange ognrange
+mysqlcheck --optimize --skip-write-binlog      --login-path=ognrange ognrange

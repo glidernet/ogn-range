@@ -18,6 +18,7 @@ sudo chown -R ognrange:adm .
 sudo chmod -R 771 .
 sudo chgrp www-data files/* perl/* index.html config/webconfig.json
 sudo chmod 775 files perl config
+mysql_config_editor set --login-path=ognrange --host=localhost --user=ognwriter --password
 #
-# change the URL on index.html & files/maptiles2.js
+# change the URLon url.js and the webconfig/binconfig files
 #
