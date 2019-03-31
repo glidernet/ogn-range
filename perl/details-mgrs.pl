@@ -69,7 +69,7 @@ if( param ) {
 	print "database problem". $DBI::errstr;
 	exit;
     }
-    $db->do( 'SET time_zone = "GMT"' );
+    $db->do( 'SET time_zone = "+00:00"' );
 
     
     my $sth =  $db->prepare( 'select s.station, sum(strength), min(lowest), max(highest), count(strength), sum(count), avg(strength), min(time), max(time) '.

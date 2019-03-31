@@ -71,7 +71,7 @@ if( param ) {
 	print "database problem". $DBI::errstr;
 	exit;
     }
-    $db->do( 'SET time_zone = "GMT"' );
+    $db->do( 'SET time_zone = "+00:00"' );
     
     my $sth =  $db->prepare( 'select distinct ref, strength from estimatedcoverage p join availability a on p.station = a.station_id and a.status = "U" '.
 			     ' where ref like ? ' );
