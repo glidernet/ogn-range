@@ -735,22 +735,27 @@ function adjustMap( what, when, where, colour ) {
       setStation(where);    
       updateURL('station');
 	} else {
-      where = matchStation(where);
-      var LngLat;
-      if ( stations[ where ] ) {
-        LngLat = [stations[where].lg,stations[where].lt];
-        if (map.getView().getZoom() < minZoomLevel ) {
-          setZoom(minZoomLevel);
-	      map.getView().setZoom(dZoom);
-        }	
-	    setCentre( LngLat );
-        map.getView().setCenter(ol.proj.fromLonLat([dLon, dLat]));
-
-        setStation(where);
+      if (where.includes('%')) {  // i.e contains wildcard
+        setStation(where);    
         updateURL('station');
-      } else {
-        $('#typeahead').val('');
-      }
+	  } else {
+        where = matchStation(where);
+        var LngLat;
+        if ( stations[ where ] ) {
+          LngLat = [stations[where].lg,stations[where].lt];
+          if (map.getView().getZoom() < minZoomLevel ) {
+            setZoom(minZoomLevel);
+	        map.getView().setZoom(dZoom);
+          }	
+	      setCentre( LngLat );
+          map.getView().setCenter(ol.proj.fromLonLat([dLon, dLat]));
+
+          setStation(where);
+          updateURL('station');
+        } else {
+          $('#typeahead').val('');
+        }
+	  }
 	}
   }
   if ( colour != null && colour != '' ) {
