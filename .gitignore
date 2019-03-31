@@ -1,4 +1,5 @@
 config/webconfig.json
 config/binconfig.json
+files/url.js
 config/url.js
 *~
