@@ -91,11 +91,12 @@ function initialize() {
     
   ambiguityOverlay = new AmbiguityMapType();
 
+  // ratio: 1.2, +/-10% instead of default +/-25%
   ambiguityLayer = new ol.layer.Image({
     source: new ol.source.ImageCanvas({
       canvasFunction: ambiguityOverlay.canvasFunctionAmbiguity,
       projection: "EPSG:3857",
-      ratio: 1.2,  // +/-10% instead of default +/-25%
+      ratio: 1.2,
       visible: false
     })
   });
@@ -103,11 +104,12 @@ function initialize() {
   // create overlay before reading hash
   coverageOverlay = new CoverageMapType();
 
+  // ratio: 1.2, +/-10% instead of default +/-25%
   coverageLayer = new ol.layer.Image({
     source: new ol.source.ImageCanvas({
       canvasFunction: coverageOverlay.canvasFunctionCoverage,
       projection: "EPSG:3857",
-      ratio: 1.2  // +/-10% instead of default +/-25%
+      ratio: 1.2
     })
   });
 
