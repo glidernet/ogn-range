@@ -86,6 +86,8 @@ warn "IP addr === $address === \n";
 warn "ProcessID: $ppid  \n";
 warn "OSname: $Config{osname}\n";
 warn "OSname: $Config{archname}\n";
+my $datestring = localtime();
+print     "--------------  Local date and time $datestring --------\n";
 # assure that not a copy of this program is running
 open my $self, '<', $0         or die "Couldn't open self: $!";
 flock $self, LOCK_EX | LOCK_NB or die "This script OGNRANGE is already running";
@@ -271,7 +273,9 @@ sub handleServer {
 			$db->do ( "insert into roughcoverage select station, concat(left(ref,6),mid(ref,8,1)) r, avg(strength) s,sum(count) c from positions_mgrs p group by station, r " );
 	    		my $now = time();
 			my $totaltime = $starttime - $now;
-			warn      "\n--------------- $server $now $totaltime  ---------------\n";
+			my $datestring = localtime();
+			print     "--------------  Local date and time $datestring --------\n";
+			warn      "--------------- $server $now $totaltime  ---------------\n";
 		}
 	    }
 
@@ -418,7 +422,7 @@ sub handleServer {
 			    }
 			}
 			elsif( $packetdata{'type'} eq 'status' ) {
-			    #		    print "status: $l\n";
+			    		    print "status: $l\n";
 			}
 			else {
 			    if ($prt) {print "\n--- new packet ---\n$l\n";}
@@ -468,8 +472,8 @@ sub getStation {
 	    return 0;
     }
 
-    if ($station =~ /FNB*/ || $station =~ /XCG*/ ||  $station =~ /OGN*/ || $station =~ /RELAY*/) {
-	    return 0;
+    if ($station =~ /^FNB/ || $station =~ /^XCG/ ||  $station =~ /^OGN*/ || $station =~ /^RELAY*/ || $station =~ /^RND/ || $station =~ /^FLR/) {
+    	return 0;
     }
 
     # figure out how it's going into the database
@@ -618,7 +622,7 @@ sub handleAvailablity {
 	# add up how many contacts each glider had
 	foreach my $station( values %pstats ) {
 	    my $temper = 1;
-	    if  (int($station->{temp}) <99)  {
+	    if  (int($station->{temp}) <999)  {
 		    $temper=int($station->{temp});
 		    }
 	    $sth_stats->execute       (  $timestamp, $station->{station}, $station->{positions}, $station->{gliders}, $station->{crc}, 0, int(($station->{cpu}||0)*10), $temper ) or die "Can't execute statement: $DBI::errstr";;
@@ -626,27 +630,34 @@ sub handleAvailablity {
 	}
 
 	my $now = time();
-	
+	my $nstup = 0;
 	if ($prt) {print "\nup: ";}
 	my @missing;
 	foreach my $station ( sort keys %station_current ) {
 	    my $last = $station_current{$station};
 	    my $s_id = getStation( $sth_addstation, $sth_history, undef, $station );
-
+	    if ($s_id == 0) { 
+		    if( $station_id {lc $station}) { $s_id = $station_id {lc $station};}
+		    if ($s_id >0) {print "YYY==>  $s_id $station \n";}
+	    }
 	    if ($prt) {print "$station [". ($station_packets{$station}||0)."]";}
 	    # if we didn't have a previous status it's a new station
 	    if( ! ($station_previous_check{$station}||0) ) {
 		$sth_log->execute( $s_id, $last, 'U' ) or die "Can't execute statement: $DBI::errstr";;
 		push( @missing, $station );
 		if ($prt) {print " (logged UP)";}
+		$nstup = $nstup +1;
 	    }
 	    if ($prt) {print ",";}
 
 	    $sth->execute( $s_id, $last, 'U' ) or die "Can't execute statement: $DBI::errstr";;
 	    $sth_active->execute( $s_id ) or die "Can't execute statement: $DBI::errstr";;
+            $nstup = $nstup +1;
 	}
+	if ($prt) {print "====> Number of active stations at: $now $nstup <====\n";}
 
 	if ($prt) {print "done.\ndown: ";}
+	my $nstdown = 0;
 	foreach my $station ( sort keys %station_previous_check ) {
 	    my $last = $station_current{$station}||0;
 	    my $s_id = getStation( $sth_addstation, $sth_history, undef, $station );
@@ -660,6 +671,7 @@ sub handleAvailablity {
 		    $sth->execute( $s_id, $now, 'D' );
 		    $sth_log->execute( $s_id, $now, 'D' );
 		    if ($prt) {print "  (logged down)";}
+		    $nstdown = $nstdown + 1;
 		}
 		if ($prt) {print ",";}
 	    }
@@ -667,6 +679,7 @@ sub handleAvailablity {
 	    $station_previous_check{$station} = $last;
 	}
 	if ($prt) {print "\n";}
+	if ($prt) {print "====> Number of down stations at: $now $nstdown <====\n";}
 	
 	foreach my $station (@missing) {
 	    $station_previous_check{$station} = $station_current{$station};
@@ -710,12 +723,12 @@ sub processStationDetailsBeacon {
     # qAC seems to be the beacons
     my $cpu = 0; my $ppm = 0; my $dbadj = 0; my $temp = 1;
     my $version = '?';
-    if ($callsign =~ /FNB*/ )
+    if ($callsign =~ /^FNB*/ )
     	{
 	return;
 	}
 
-    if ($callsign =~ /XCG*/)
+    if ($callsign =~ /^XCG*/)
     	{
 	return;
 	}
@@ -755,7 +768,7 @@ sub processStationDetailsBeacon {
 	}
     }
     
-    if ($prt) {printf (":: %20s: ppm %0.1f/%0.1f db [%-70s]\n", $callsign,($ppm||-99),($dbadj||-99),$comment);}
+    if ($prt) {printf (":::: %20s: ppm %0.1f %0.1f db [%-70s]\n", $callsign,($ppm||-99),($dbadj||-99),$comment);}
     
     if( defined($ppm) && defined($dbadj) )
     {
