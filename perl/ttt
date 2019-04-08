@@ -1,0 +1,3 @@
+set time_zone = "+00:00";
+set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+select o.station,sl.lt,sl.lg,a.status, left(o.otime,16),o.active, version  from stations o left join availability a on o.id = a.station_id , stationlocation sl where  o.id = sl.station and sl.lt is not NULL  and o.otime > '2000-01-01' and  sl.time=(select max(i.time) from stationlocation i  where i.station=o.id and i.time between '2010-01-01' and '2100-01-01')   and ( '2010-01-01' < now() or o.active = "Y"  ) group by o.station;

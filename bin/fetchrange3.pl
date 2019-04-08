@@ -530,17 +530,18 @@ sub handleAvailablity {
     }
     $db->do( 'SET time_zone = "+00:00"' );
     
-    my $sth_sids = $db->prepare( 'select station, id from stations' ); $sth_sids->execute() or die "Can't execute statement: $DBI::errstr";;
-    my $sth_gids = $db->prepare( 'select glider_id, callsign from gliders' ); $sth_gids->execute() or die "Can't execute statement: $DBI::errstr";;
-    my $sth = $db->prepare( 'insert into availability values ( ?, ?, ? ) on duplicate key update time = values(time), status = values(status)' );
-    my $sth_active = $db->prepare( 'update stations set active="Y" where id = ? and active="N"' );
-    my $sth_log = $db->prepare( 'insert into availability_log values ( ?, ?, ? )' );
-    my $sth_first = $db->prepare( 'select s.station, time from stations s, availability a where s.id = a.station_id and a.status = "U"' ); $sth_first->execute() or die "Can't execute statement: $DBI::errstr";;
-    my $sth_addstation = $db->prepare( 'insert into stations ( station ) values ( ? )' );
+    my $sth_sids	= $db->prepare( 'select station, id from stations' );        $sth_sids->execute() or die "Can't execute statement: $DBI::errstr";;
+    my $sth_gids	= $db->prepare( 'select glider_id, callsign from gliders' ); $sth_gids->execute() or die "Can't execute statement: $DBI::errstr";;
+    my $sth 		= $db->prepare( 'insert into availability values ( ?, ?, ? ) on duplicate key update time = values(time), status = values(status)' );
+    my $sth_active 	= $db->prepare( 'update stations set active="Y" where id = ? and active="N"' );
+    my $sth_activetime 	= $db->prepare( 'update stations set active="Y" where otime + 360 > now() and active="N"' );
+    my $sth_log 	= $db->prepare( 'insert into availability_log values ( ?, ?, ? )' );
+    my $sth_first 	= $db->prepare( 'select s.station, time from stations s, availability a where s.id = a.station_id and a.status = "U"' ); $sth_first->execute() or die "Can't execute statement: $DBI::errstr";;
+    my $sth_addstation 	= $db->prepare( 'insert into stations ( station ) values ( ? )' );
     my $sth_updatestation = $db->prepare( 'update stations set station = ? where id = ?' );
-    my $sth_history =  $db->prepare( 'insert into history values ( now(), ?, ?, ? )' );
-    my $sth_timestamp = $db->prepare( 'SELECT concat(Date(now())," ",SEC_TO_TIME((TIME_TO_SEC(now()) DIV 300) * 300)) AS round_time' );
-    my $sth_stats =  $db->prepare( 'insert into stats values ( ?, ?, ?, ?, ?, ?, ?, ? )' );
+    my $sth_history 	= $db->prepare( 'insert into history values ( now(), ?, ?, ? )' );
+    my $sth_timestamp 	= $db->prepare( 'SELECT concat(Date(now())," ",SEC_TO_TIME((TIME_TO_SEC(now()) DIV 300) * 300)) AS round_time' );
+    my $sth_stats 	= $db->prepare( 'insert into stats values ( ?, ?, ?, ?, ?, ?, ?, ? )' );
     my $sth_statssummary =  $db->prepare( 'insert into statssummary values ( ?, ?, ?, ?, ?, ?, ?, ? ) on duplicate key update positions=values(positions),gliders=values(gliders),crc=values(crc),ignoredpositions=values(ignoredpositions),cpu=values(cpu),temp=values(temp),time=values(time)' );
 
     my %station_previous_check = ();
@@ -654,6 +655,7 @@ sub handleAvailablity {
 	    $sth_active->execute( $s_id ) or die "Can't execute statement: $DBI::errstr";;
             $nstup = $nstup +1;
 	}
+	$sth_activetime->execute();
 	if ($prt) {print "====> Number of active stations at: $now $nstup <====\n";}
 
 	if ($prt) {print "done.\ndown: ";}
@@ -680,6 +682,7 @@ sub handleAvailablity {
 	}
 	if ($prt) {print "\n";}
 	if ($prt) {print "====> Number of down stations at: $now $nstdown <====\n";}
+	print "====> Number of down stations at: $now $nstdown <====\n";
 	
 	foreach my $station (@missing) {
 	    $station_previous_check{$station} = $station_current{$station};
@@ -701,7 +704,8 @@ sub datet {
 sub processStationLocationBeacon {
     my ($db,$callsign,$s_id,$lt,$lg,$altitude,$comment) = @_;
 
-    my $st_station_loc = $db->prepare( 'insert into stationlocation (time,station,lt,lg,height,country) values ( left(now(),10), ?, ?, ?, ?, ? ) on duplicate key update lt = values(lt), lg = values(lg), country=values(country)' );
+    my $st_station_loc   = $db->prepare('insert into stationlocation (time,station,lt,lg,height,country) values ( left(now(),10), ?, ?, ?, ?, ? ) on duplicate key update lt = values(lt), lg = values(lg), country=values(country)' );
+    my $st_station_otime = $db->prepare('update stations set otime=now() where station = ? ;');
     
     lock( %stations_loc );
     if( ($stations_loc{$callsign}||'') ne "$lt/$lg" ) {
@@ -709,10 +713,11 @@ sub processStationLocationBeacon {
 	if ($altitude > 9999) {
 		$altitude = 9999;
 	}
-	$st_station_loc->execute( $s_id, $lt, $lg, $altitude, $c );
+	$st_station_loc->execute( $s_id, $lt, $lg, $altitude, $c );	# update the new location
 	if ($prt) {print "station $callsign location update to $lt, $lg ($c)\n";}
 	$stations_loc{$callsign} = "$lt/$lg";
     }
+    $st_station_otime->execute($callsign);			# update the last heartbeat
 }
 
 sub processStationDetailsBeacon {

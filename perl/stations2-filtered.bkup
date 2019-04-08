@@ -76,11 +76,17 @@ if( param ) {
     print header( -type=>'application/json',
 		  -expires=>'+2m' );
 
-    $db->do(' set time_zone = "+00:00"');
-    $db->do(' set session sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"');
-    my $sth_station    = $db->prepare(' select o.station,sl.lt,sl.lg,a.status, left(o.otime,16),o.active, version  from stations o left join availability a on o.id = a.station_id , stationlocation sl where  o.id = sl.station and sl.lt is not NULL  and o.otime > "2000-01-01" and  sl.time=(select max(i.time) from stationlocation i  where i.station=o.id and i.time between ? and ?)    group by o.station');
+    my $sth_station = $db->prepare( 'select o.station,lt,lg,status, '.
+				    '  (select left(from_unixtime(time),16) from availability al1 where al1.station_id = o.id) time, '.
+				    '  (select count(*) from availability_log al where al.station_id = o.id and al.time > unix_timestamp() - 3600*24) bounces, '.
+				    '  version '.
+				    '  from stations o left join availability a on o.id = a.station_id, '.
+				    '   stationlocation sl where  o.id = sl.station and '.
+				    '   sl.time=(select max(i.time) from stationlocation i where i.station=o.id and i.time between ? and ?) '.
+				    '  and ( ? < now() or o.active = "Y" ) '.
+				    ' order by active asc, time, station asc' );
 
-    $sth_station->execute( $start, $end );
+    $sth_station->execute( $start, $end, $end );
 	 
     print '{"stations":[';
     
@@ -98,11 +104,6 @@ if( param ) {
 	if( ! defined($row->[3]) ) {
 	    $row->[3] = 'D';
 	}
-	if ($row->[3] eq 'D' and (defined($row->[4] and $row->[4] + 500 > time())))
-		{
-			#warn "Station: $row->[0]  $row->[1]  $row->[2]  $row->[3] $row->[4] " ;
-			$row->[3] = 'U';
-		}
 
 	printf( '{"s":"%s","lt":%.4f,"lg":%.4f,"u":"%s","ut":"%s","b":%d,"v":"%s"}', @{$row} );
     }
