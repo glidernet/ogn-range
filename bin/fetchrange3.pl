@@ -56,7 +56,7 @@ use LatLngCoarse2;
 #
 
 my $prt=0;
-my $pgmversion = "0.4.0";
+my $pgmversion = "0.4.1";
 
 #
 # load the configuration file
@@ -346,7 +346,7 @@ sub handleServer {
 				    my $reduced = ($1||'0'); $reduced .= $2.$3;
 
 				    # and store the record in the db
-				    $sth_mgrs->execute( $s_id, $reduced, $strength, $height, $height ) or warn "Can't execute statement: $DBI::errstr";;
+				    if ($s_id > 0) {$sth_mgrs->execute( $s_id, $reduced, $strength, $height, $height ) or warn "Can't execute statement: $DBI::errstr";;}
 
 				    if( $full ) {
 					if ($prt) {print "DUP: $s_callsign $s_id ($v1) lt='$lt_r' and lg='$lg_r'\n";}
@@ -486,12 +486,12 @@ sub getStation {
 	    $station_id{lc $station} = $s_id;
 	    $station_name{ lc $station } = $station;
 	    if ($prt) {print "\nnew station $station => $s_id\n";}
-	    $sth_history->execute( $s_id, 'new', "New station $station" ) or warn "Can't execute statement: $DBI::errstr";;
+	    if ($s_id > 0) {$sth_history->execute( $s_id, 'new', "New station $station" ) or warn "Can't execute statement: $DBI::errstr";;}
 	}
 	elsif( $sth_supdate && ($station_name{ lc $station }||$station) ne $station ) {
 	    $sth_supdate->execute( $station, $s_id ) or warn "Can't execute statement: $DBI::errstr";;	
 	    if ($prt) {print "\nrenamed station $station => $s_id\n";}
-	    $sth_history->execute( $s_id, 'renamed', $station_name{ lc $station } . " now $station" ) or warn "Can't execute statement: $DBI::errstr";;
+	    if ($s_id > 0) {$sth_history->execute( $s_id, 'renamed', $station_name{ lc $station } . " now $station" ) or warn "Can't execute statement: $DBI::errstr";;}
 	    $station_name{ lc $station } = $station;
 	}
 	
@@ -644,15 +644,17 @@ sub handleAvailablity {
 	    if ($prt) {print "$station [". ($station_packets{$station}||0)."]";}
 	    # if we didn't have a previous status it's a new station
 	    if( ! ($station_previous_check{$station}||0) ) {
-		$sth_log->execute( $s_id, $last, 'U' ) or die "Can't execute statement: $DBI::errstr";;
+		if ($s_id > 0) {$sth_log->execute( $s_id, $last, 'U' ) or die "Can't execute statement: $DBI::errstr";;}
 		push( @missing, $station );
 		if ($prt) {print " (logged UP)";}
 		$nstup = $nstup +1;
 	    }
 	    if ($prt) {print ",";}
 
-	    $sth->execute( $s_id, $last, 'U' ) or die "Can't execute statement: $DBI::errstr";;
-	    $sth_active->execute( $s_id ) or die "Can't execute statement: $DBI::errstr";;
+	    if ($s_id > 0) {
+		    $sth->execute( $s_id, $last, 'U' ) or die "Can't execute statement: $DBI::errstr";;
+	    	    $sth_active->execute( $s_id ) or die "Can't execute statement: $DBI::errstr";;
+	    }
             $nstup = $nstup +1;
 	}
 	$sth_activetime->execute();
@@ -670,8 +672,11 @@ sub handleAvailablity {
 	    if( ! $last ) {
 		if ($prt) {print "$station";}
 		if( $station_previous_check{$station} ) {
-		    $sth->execute( $s_id, $now, 'D' );
-		    $sth_log->execute( $s_id, $now, 'D' );
+			if ($s_id > 0) {
+
+		    		$sth->execute( $s_id, $now, 'D' );
+		    		$sth_log->execute( $s_id, $now, 'D' );
+			}
 		    if ($prt) {print "  (logged down)";}
 		    $nstdown = $nstdown + 1;
 		}
@@ -704,20 +709,22 @@ sub datet {
 sub processStationLocationBeacon {
     my ($db,$callsign,$s_id,$lt,$lg,$altitude,$comment) = @_;
 
+    if ($s_id == 0) {return;} 						# nthing to do
+    
     my $st_station_loc   = $db->prepare('insert into stationlocation (time,station,lt,lg,height,country) values ( left(now(),10), ?, ?, ?, ?, ? ) on duplicate key update lt = values(lt), lg = values(lg), country=values(country)' );
     my $st_station_otime = $db->prepare('update stations set otime=now() where station = ? ;');
     
     lock( %stations_loc );
-    if( ($stations_loc{$callsign}||'') ne "$lt/$lg" ) {
-	my $c = '';#getCountry($lt,$lg)
+    if( ($stations_loc{$callsign}||'') ne "$lt/$lg" and $s_id > 0) {
+	my $c = '';							#getCountry($lt,$lg)
 	if ($altitude > 9999) {
 		$altitude = 9999;
 	}
-	$st_station_loc->execute( $s_id, $lt, $lg, $altitude, $c );	# update the new location
+	if ($s_id > 0) {$st_station_loc->execute( $s_id, $lt, $lg, $altitude, $c );}	# update the new location
 	if ($prt) {print "station $callsign location update to $lt, $lg ($c)\n";}
 	$stations_loc{$callsign} = "$lt/$lg";
     }
-    $st_station_otime->execute($callsign);			# update the last heartbeat
+    if($s_id > 0) {$st_station_otime->execute($callsign);} 			# update the last heartbeat
 }
 
 sub processStationDetailsBeacon {
@@ -766,7 +773,7 @@ sub processStationDetailsBeacon {
     
     {	
 	lock( %stations_ver );
-	if( ($stations_ver{$callsign}||'') ne "$version" ) {
+	if( ($stations_ver{$callsign}||'') ne "$version" and $s_id > 0) {
 	    $st_station_ver->execute( $s_id, $version );
 	    if ($prt) {print "station $callsign version update to ($version)\n";}
 	    $stations_ver{$callsign} = "$version";
