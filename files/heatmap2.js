@@ -334,7 +334,7 @@ function addStation( location, colour ) {
       geometry: new ol.geom.Point(ol.proj.fromLonLat([location.lg,location.lt])),
       lat: location.lt,
       lon: location.lg,
-      info: location.s + "\n" + (location.u == "U" ? "Up at " : "Last point at ") + location.ut + "Z\n" + location.b + " availability changes in 24hrs\n" +
+      info: location.s + "\n" + (location.u == "U" ? "Up HB at " : "Last point at ") + location.ut + "Z\n" + location.b + " availability changes in 24hrs\n" +
         "Version " + location.v,
       mark: "S",
       name: location.s,
