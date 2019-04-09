@@ -1,6 +1,12 @@
-#!/bin/bash
+#!/bin/basha
+cd /var/www/html/OGNRANGE
+date
 #
-echo "Deleteing the phantom STATIOS"
+echo "Stop de OGNRANGE daemon, in order to improve performance"
+#
+killall perl
+#
+echo "Deleting the phantom STATIONS"
 #
 bash deletephantoms.sh NAVITER
 bash deletephantoms.sh FLYMASTER
@@ -33,11 +39,21 @@ bash deleteFNB.sh      TEST
 #
 echo "deleting the data before January 2018"
 #
-mysql --login-path=ognrange ognrange <config/deleteoldata.sql
+#mysql --login-path=ognrange ognrange <config/deleteoldata.sql
+#
+echo "Check and delete stations with no location and data with no station in the ognrange database"
+#
+bash deloldstations.sh
+bash delzombies.sh
 #
 echo "Check and optimize the ognrange database"
 #
-mysql        -e "reset query cache;"           --login-path=ognrange ognrange
-mysqlcheck                                     --login-path=ognrange ognrange
-mysql        -e "reset query cache;"           --login-path=ognrange ognrange
-mysqlcheck --optimize --skip-write-binlog      --login-path=ognrange ognrange
+mysql        --login-path=ognrange -e "reset query cache;"           ognrange
+mysqlcheck   --login-path=ognrange                                   ognrange
+mysql        --login-path=ognrange -e "reset query cache;"           ognrange
+#mysqlcheck --optimize --skip-write-binlog      --login-path=ognrange ognrange
+date
+#
+echo "Start de OGNRANGE daemon ..."
+#
+bash /home/angel/src/OGNrangecheck.sh
