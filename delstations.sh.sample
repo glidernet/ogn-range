@@ -1,6 +1,9 @@
 #!/bin/basha
+{
 cd /var/www/html/OGNRANGE
 date
+bash countoldstations.sh
+bash countzombies.sh
 #
 echo "Stop de OGNRANGE daemon, in order to improve performance"
 #
@@ -52,8 +55,11 @@ mysql        --login-path=ognrange -e "reset query cache;"           ognrange
 mysqlcheck   --login-path=ognrange                                   ognrange
 mysql        --login-path=ognrange -e "reset query cache;"           ognrange
 #mysqlcheck --optimize --skip-write-binlog      --login-path=ognrange ognrange
+bash countoldstations.sh
+bash countzombies.sh
 date
 #
 echo "Start de OGNRANGE daemon ..."
 #
 bash /home/angel/src/OGNrangecheck.sh
+} | mutt  -s " REPOOGN OGNRANGE DB cleanup " -- yourname@yourmail.name
