@@ -19,7 +19,7 @@ var defaultColour = '#80000040:#008000ff';
 var minZoomLevel = 8;
 var maxZoomLevel = 11;
 
-var selected = { 'what':'max', 'when':'recent', 'station':'', 'center':'', 'zoom':'', 'airspace':'', 'airports':'', 'circles':'', 'ambiguity':'', 'colour': defaultColour };
+var selected = { 'what':'max', 'when':'lastweek', 'station':'', 'center':'', 'zoom':'', 'airspace':'', 'airports':'', 'circles':'', 'ambiguity':'', 'colour': defaultColour };
 
 function initialize() {
 
