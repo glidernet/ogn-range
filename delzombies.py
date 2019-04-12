@@ -10,6 +10,7 @@ import json
 import signal
 import socket
 import MySQLdb                  # thdde SQL data base routines^M
+print "\n\n"
 print "Start OGNRANGE delete zombies "
 print "=============================="
 
@@ -17,16 +18,16 @@ date=datetime.utcnow()                  # get the date
 dte=date.strftime ("%y%m%d %H:%M:%S")             # today's date
 DBhost                  = "localhost"
 DBname                  = "ognrange"
-with open('config/binconfig.json', 'r') as f:
+with open('config/ognconfig.json', 'r') as f:
     cnfg = json.load(f)
 config=cnfg['config']
-print "Config:", cnfg, config
+print "Config:", config
 DBuser                  = config['dbusername']
 DBpasswd                = config['dbpassword']
 dlt=True
 conn=MySQLdb.connect(host=DBhost, user=DBuser, passwd=DBpasswd, db=DBname)
 print "MySQL Database:", DBname, " at Host:", DBhost
-print "Start Date:", dte
+print "\n\nStart Date:", dte
 curs1=conn.cursor()
 curs2=conn.cursor()
 row=""
@@ -67,7 +68,7 @@ while row is not None:
     row = curs1.fetchone()
     print "R1", row
 
-print "Pos mngrs:", cnt1, cnt2
+print ">>>>> Pos mngrs:", cnt1, cnt2
 cnt1=0
 cnt2=0
 try:
@@ -101,7 +102,7 @@ while row is not None:
     row = curs1.fetchone()
     print "R1", row
 
-print "avail log:", cnt1, cnt2
+print ">>>>> avail log:", cnt1, cnt2
 cnt1=0
 cnt2=0
 try:
@@ -119,7 +120,7 @@ while row is not None:
     try:
         if (dlt):
             delcmd3="DELETE FROM stats WHERE station = "+str(row[0])
-            curs2.execute(delcmd2)
+            curs2.execute(delcmd3)
         else:    
             curs2.execute( "select * FROM stats WHERE station = "+str(row[0]))
             for row2 in curs2:
@@ -135,8 +136,9 @@ while row is not None:
     row = curs1.fetchone()
     print "R1", row
 
-print "Stats:", cnt1, cnt2
-date=datetime.utcnow()                  # get the date
-dte=date.strftime ("%y%m%d %H:%M:%S")             # today's date
+print ">>>>> Stats:", cnt1, cnt2
 conn.commit()
-print "End Date:", dte
+conn.close()
+date=datetime.utcnow()                  # get the date
+dte=date.strftime ("%y%m%d %H:%M:%S")   # today's date
+print "End Date:", dte, "\n\n"
