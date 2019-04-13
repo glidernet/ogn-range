@@ -1,0 +1,10 @@
+#!/bin/bash
+{
+cd /var/www/html/OGNRANGE
+date
+date
+#
+echo "Start de OGNRANGE daemon ..."
+#
+bash /home/angel/src/OGNrangecheck.sh
+} | mutt  -s "REPOOGN OGNRANGE DB cleanup .... " -- acasadoalonso@gmail.com

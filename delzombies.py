@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from ctypes import *
 from datetime import datetime
 import time
@@ -38,6 +40,15 @@ selcmd1="select distinct station from positions_mgrs where station not in (selec
 selcmd2="select distinct station from stationlocation where lt is NULL"
 selcmd3="select distinct station from stats where station not in (select id from stations)"
 selcmd4="select count(*)  from stationlocation where lt is NULL"
+
+
+dtereq =  sys.argv[1:]
+if dtereq and dtereq[0] == 'NO':
+    dlt = False                 
+    print "No delete, just report ....\n\n"
+#
+# main logic
+#
 try:
     curs1.execute(selcmd1)
     row = curs1.fetchone()
@@ -47,7 +58,7 @@ except MySQLdb.Error, e:
     except IndexError:
         print ">>>MySQL Error: %s" % str(e)
         print ">>>MySQL error:", selcmd
-print "R1", row
+print "R1 Station invalid:", row
 while row is not None:
     cnt1 +=1
     try:
@@ -57,7 +68,7 @@ while row is not None:
         else:
             curs2.execute( "select * from positions_mgrs where station = "+str(row[0]))
             for row2 in curs2:
-                #print "R2:", (row2)
+                print "RR1:", (row2)
                 cnt2 +=1
     except MySQLdb.Error, e:
      try:
@@ -67,14 +78,14 @@ while row is not None:
         print ">>>MySQL error:", delcmd
     conn.commit()
     row = curs1.fetchone()
-    print "R1", row
+    print "R1 Station invalid:", row
 
 print ">>>>> Pos mngrs:", cnt1, cnt2
 cnt1=0
 cnt2=0
 curs1.execute(selcmd4)
 row = curs1.fetchone()
-print "Count avl:", row
+print "Count of stationlocation where no coordinates: ", row
 try:
     curs1.execute(selcmd2)
     row = curs1.fetchone()
@@ -84,7 +95,7 @@ except MySQLdb.Error, e:
     except IndexError:
         print ">>>MySQL Error: %s" % str(e)
         print ">>>MySQL error:", selcmd
-print "R1", row
+print "R2 invalid station location: ", row
 while row is not None:
     cnt1 +=1
     try:
@@ -94,7 +105,7 @@ while row is not None:
         else:
             curs2.execute( "select * FROM availability_log WHERE station_id = "+str(row[0]))
             for row2 in curs2:
-                #print "R2:", (row2)
+                print "RR2:", (row2)
                 cnt2 +=1
     except MySQLdb.Error, e:
      try:
@@ -104,11 +115,11 @@ while row is not None:
         print ">>>MySQL error:", delcmd
     conn.commit()
     row = curs1.fetchone()
-    print "R1", row
+    print "R2 station:", row
 
 delcmd4="DELETE from stationlocation where lt is NULL"
 curs2.execute(delcmd4)
-print ">>>>> avail log:", cnt1, cnt2
+print ">>>>> Avail log counters:", cnt1, cnt2
 cnt1=0
 cnt2=0
 try:
@@ -120,7 +131,7 @@ except MySQLdb.Error, e:
     except IndexError:
         print ">>>MySQL Error: %s" % str(e)
         print ">>>MySQL error:", selcmd
-print "R1", row
+print "R3 Invalid stats Station:", row
 while row is not None:
     cnt1 +=1
     try:
@@ -130,7 +141,7 @@ while row is not None:
         else:
             curs2.execute( "select * FROM stats WHERE station = "+str(row[0]))
             for row2 in curs2:
-                #print "R2:", (row2)
+                print "RR3:", (row2)
                 cnt2 +=1
     except MySQLdb.Error, e:
      try:
@@ -140,9 +151,9 @@ while row is not None:
         print ">>>MySQL error:", delcmd
     conn.commit()
     row = curs1.fetchone()
-    print "R1", row
+    print "R3 Invalid stats Station:", row
 
-print ">>>>> Stats:", cnt1, cnt2
+print ">>>>> Stats counter:", cnt1, cnt2
 conn.commit()
 conn.close()
 date=datetime.utcnow()                  # get the date
