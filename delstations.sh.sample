@@ -70,3 +70,4 @@ echo "Start de OGNRANGE daemon ..."
 #
 bash /home/angel/src/OGNrangecheck.sh
 } | mutt  -s " REPOOGN OGNRANGE DB cleanup " -- yourname@gmail.com
+cd
