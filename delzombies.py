@@ -40,6 +40,7 @@ selcmd1="select distinct station from positions_mgrs where station not in (selec
 selcmd2="select distinct station from stationlocation where lt is NULL"
 selcmd3="select distinct station from stats where station not in (select id from stations)"
 selcmd4="select count(*)  from stationlocation where lt is NULL"
+selcmd5="select count(*)  from availability_log where station_id not in (select id from stations)"
 
 
 dtereq =  sys.argv[1:]
@@ -86,6 +87,9 @@ cnt2=0
 curs1.execute(selcmd4)
 row = curs1.fetchone()
 print "Count of stationlocation where no coordinates: ", row
+curs1.execute(selcmd5)
+row = curs1.fetchone()
+print "Count of availability_log where no valid station: ", row
 try:
     curs1.execute(selcmd2)
     row = curs1.fetchone()
@@ -118,7 +122,10 @@ while row is not None:
     print "R2 station:", row
 
 delcmd4="DELETE from stationlocation where lt is NULL"
-curs2.execute(delcmd4)
+delcmd5="DELETE from availability_log where station_id not in (select id from stations)"
+if (dlt):
+    curs2.execute(delcmd4)
+    curs2.execute(delcmd5)
 print ">>>>> Avail log counters:", cnt1, cnt2
 cnt1=0
 cnt2=0
