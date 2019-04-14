@@ -469,10 +469,10 @@ sub getStation {
     my($sth_add,$sth_history,$sth_supdate,$station) = @_;
     my $s_id = undef;
     if ($station eq 'SPOT' || $station eq 'SPIDER' || $station eq 'INREACH' || $station eq "FLYMASTER" || $station eq 'NAVITER' || $station eq 'CAPTURS' || $station eq 'LT24' || $station eq 'SKYLINES' ) {
-	    return 0;
+	return 0;
     }
 
-    if ($station =~ /^FNB/ || $station =~ /^XCG/ ||  $station =~ /^OGN*/ || $station =~ /^RELAY*/ || $station =~ /^RND/ || $station =~/^FLR/ || $station =~/^bKky/ ) {
+    if ($station =~ /^FNB/ || $station =~ /^XCG/ ||  $station =~ /^OGN*/ || $station =~ /^RELAY*/ || $station =~ /^RND/ || $station =~/^FLR/ || $station =~/^bSky/ || $station =~/^AIRS/) {
     	return 0;
     }
 
