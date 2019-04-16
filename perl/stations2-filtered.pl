@@ -29,7 +29,7 @@ use strict;
 
 use CGI qw/:standard/;
 use DBI;
-
+use Date::Parse;
 use JSON;
 
 # load the configuration file
@@ -98,10 +98,16 @@ if( param ) {
 	if( ! defined($row->[3]) ) {
 	    $row->[3] = 'D';
 	}
-	if ($row->[3] eq 'D' and (defined($row->[4] and $row->[4] + 500 > time())))
+	my $tdiff = 9999;
+	if (defined($row->[4])) {
+		$tdiff= time - str2time($row->[4]) ;
+	}
+				
+	if ($row->[3] eq 'D' and $tdiff < 500)
 		{
 			#warn "Station: $row->[0]  $row->[1]  $row->[2]  $row->[3] $row->[4] " ;
 			$row->[3] = 'U';
+			#print "\n>>>>",$row->[4], "T: ",time, "TT: ", time - str2time($row->[4]),"\n\n";
 		}
 
 	printf( '{"s":"%s","lt":%.4f,"lg":%.4f,"u":"%s","ut":"%s","b":%d,"v":"%s"}', @{$row} );

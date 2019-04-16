@@ -1,0 +1,8 @@
+use DateTime::Format::Strptime;
+my $strp = DateTime::Format::Strptime->new(
+   pattern => '%d.%m.%Y  %T',
+   time_zone => 'local',
+);
+my $dt = $strp->parse_datetime('23.10.2011  11:35:00');
+print $dt->epoch;
+
