@@ -98,16 +98,16 @@ if( param ) {
 	if( ! defined($row->[3]) ) {
 	    $row->[3] = 'D';
 	}
-	my $tdiff = 9999;
+	my $tdiff = 99999;
 	if (defined($row->[4])) {
 		$tdiff= time - str2time($row->[4]) ;
+		#if ($row->[3] eq 'D') {print "\n\n >>>>>> ", $row->[0]," T: ", $tdiff, " UT: ", $row->[4], "\n";}
 	}
 				
-	if ($row->[3] eq 'D' and $tdiff < 500)
+	if ($row->[3] eq 'D' and $tdiff < 12000)
 		{
 			#warn "Station: $row->[0]  $row->[1]  $row->[2]  $row->[3] $row->[4] " ;
 			$row->[3] = 'U';
-			#print "\n>>>>",$row->[4], "T: ",time, "TT: ", time - str2time($row->[4]),"\n\n";
 		}
 
 	printf( '{"s":"%s","lt":%.4f,"lg":%.4f,"u":"%s","ut":"%s","b":%d,"v":"%s"}', @{$row} );
