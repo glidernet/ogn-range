@@ -1,5 +1,13 @@
 #!/bin/bash
+cd /var/www/html/OGNRANGE
+day=`date "+%a"`
+DMY=`date "+%x"`
+now=`date "+%R"`
+hn=`hostname   `
+taken=$day"_"$DMY"_"$now
+
 {
+echo "Starting deleting zombie stations at: "$(date)
 cd /var/www/html/OGNRANGE
 date
 #
@@ -14,6 +22,7 @@ bash countzombies.sh
 #
 echo "Deleting the phantom STATIONS"
 #
+date
 bash deletephantoms.sh NAVITER
 bash deletephantoms.sh FLYMASTER
 bash deletephantoms.sh SPOT
@@ -30,18 +39,19 @@ bash deletephantoms.sh Home
 bash deletephantoms.sh MyStation
 bash deletephantoms.sh abcde
 #
-echo "deleting the pseudo STATIONS"
+echo "Deleting the pseudo STATIONS"
 #
-bash deleteFNB.sh      FNB
-bash deleteFNB.sh      XCG
-bash deleteFNB.sh      XCC
-bash deleteFNB.sh      OGN
-bash deleteFNB.sh      ICA
-bash deleteFNB.sh      FLR
-bash deleteFNB.sh      bSkyN
-bash deleteFNB.sh      AIRS
-bash deleteFNB.sh      AIRS-
-bash deleteFNB.sh      TEST
+date
+bash deleteFNB.sh      FNB      Y
+bash deleteFNB.sh      XCG      Y
+bash deleteFNB.sh      XCC      Y
+bash deleteFNB.sh      OGN      Y
+bash deleteFNB.sh      ICA      Y
+bash deleteFNB.sh      FLR      Y
+bash deleteFNB.sh      bSkyN    Y
+bash deleteFNB.sh      AIRS     Y
+bash deleteFNB.sh      AIRS-    Y
+bash deleteFNB.sh      TEST     Y
 #
 echo "deleting the data before January 2018"
 #
@@ -49,25 +59,34 @@ echo "deleting the data before January 2018"
 #
 echo "Check and delete stations with no location and data with no station in the ognrange database"
 #
+date
 python delzombies.py
+date
 bash deloldstations.sh
+date
 bash delzombies.sh
 #
-echo "Check and optimize the ognrange database"
+echo "Check the ognrange database"
 #
+date
 mysql        --login-path=ognrange -e "reset query cache;"           ognrange
 mysqlcheck   --login-path=ognrange                                   ognrange
 mysql        --login-path=ognrange -e "reset query cache;"           ognrange
-#mysqlcheck --optimize --skip-write-binlog      --login-path=ognrange ognrange
+date
+echo "Optimize the ognrange database"
+mysqlcheck   --login-path=ognrange --optimize --skip-write-binlog    ognrange
 #
 echo "Count now the number of zombie stations"
 #
+date
 bash countoldstations.sh
+date
 bash countzombies.sh
 date
 #
 echo "Start de OGNRANGE daemon ..."
 #
-bash /home/angel/src/OGNrangecheck.sh
-} | mutt  -s " REPOOGN OGNRANGE DB cleanup " -- yourname@gmail.com
+date
+} | mutt  -s $hn" REPOOGN OGNRANGE DB cleanup .... "$taken -- yourname@yourserver.com
+bash /home/angel/src/OGNrangecheck.sh  &
 cd

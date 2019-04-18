@@ -472,7 +472,7 @@ sub getStation {
 	return 0;
     }
 
-    if ($station =~ /^FNB/ || $station =~ /^XCG/ ||  $station =~ /^OGN*/ || $station =~ /^RELAY*/ || $station =~ /^RND/ || $station =~/^FLR/ || $station =~/^bSky/ || $station =~/^AIRS/) {
+    if ($station =~ /^FNB/ || $station =~ /^XCG/ ||  $station =~ /^XCC/ || $station =~ /^OGN*/ || $station =~ /^RELAY*/ || $station =~ /^RND/ || $station =~/^FLR/ || $station =~/^bSky/ || $station =~/^AIRS/) {
     	return 0;
     }
 
@@ -687,7 +687,8 @@ sub handleAvailablity {
 	}
 	if ($prt) {print "\n";}
 	if ($prt) {print "====> Number of down stations at: $now $nstdown <====\n";}
-	print "====> Number of down stations at: $now $nstdown <====\n";
+	my $localtime = localtime();
+	print "====> Number of down stations at: $now $localtime $nstdown <====\n";
 	
 	foreach my $station (@missing) {
 	    $station_previous_check{$station} = $station_current{$station};
