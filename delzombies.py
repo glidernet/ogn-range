@@ -50,6 +50,7 @@ if dtereq and dtereq[0] == 'NO':
 #
 # main logic
 #
+print selcmd1
 try:
     curs1.execute(selcmd1)
     row = curs1.fetchone()
@@ -59,7 +60,7 @@ except MySQLdb.Error, e:
     except IndexError:
         print ">>>MySQL Error: %s" % str(e)
         print ">>>MySQL error:", selcmd
-print "R1 Station invalid:", row
+print "R1 Data from Position managers from Station that does not exists anymore: ", row
 while row is not None:
     cnt1 +=1
     try:
@@ -79,9 +80,10 @@ while row is not None:
         print ">>>MySQL error:", delcmd
     conn.commit()
     row = curs1.fetchone()
-    print "R1 Station invalid:", row
+    print "R1 Data from Position managers from Station that does not exists anymore: ", row
 
-print ">>>>> Pos mngrs:", cnt1, cnt2
+print ">>>>> Position mngrs counter: ", cnt1, cnt2
+print selcmd2
 cnt1=0
 cnt2=0
 curs1.execute(selcmd4)
@@ -100,6 +102,7 @@ except MySQLdb.Error, e:
         print ">>>MySQL Error: %s" % str(e)
         print ">>>MySQL error:", selcmd
 print "R2 invalid station location: ", row
+print "R2 Data from Station localtion  where no data valid: ", row
 while row is not None:
     cnt1 +=1
     try:
@@ -119,14 +122,15 @@ while row is not None:
         print ">>>MySQL error:", delcmd
     conn.commit()
     row = curs1.fetchone()
-    print "R2 station:", row
+    print "R2 station location not valid:", row
 
 delcmd4="DELETE from stationlocation where lt is NULL"
 delcmd5="DELETE from availability_log where station_id not in (select id from stations)"
 if (dlt):
     curs2.execute(delcmd4)
     curs2.execute(delcmd5)
-print ">>>>> Avail log counters:", cnt1, cnt2
+print ">>>>> Availability log counters:", cnt1, cnt2
+print selcmd3
 cnt1=0
 cnt2=0
 try:
@@ -138,7 +142,7 @@ except MySQLdb.Error, e:
     except IndexError:
         print ">>>MySQL Error: %s" % str(e)
         print ">>>MySQL error:", selcmd
-print "R3 Invalid stats Station:", row
+print "R3 Data from stats from Station that does not exists anymore: ", row
 while row is not None:
     cnt1 +=1
     try:
@@ -158,7 +162,7 @@ while row is not None:
         print ">>>MySQL error:", delcmd
     conn.commit()
     row = curs1.fetchone()
-    print "R3 Invalid stats Station:", row
+    print "R3 Data from stats from Station that does not exists anymore: ", row
 
 print ">>>>> Stats counter:", cnt1, cnt2
 conn.commit()

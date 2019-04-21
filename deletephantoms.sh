@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "Delete invalid station: "$1
 echo "select * from stations                where  station = '$1';"       
 mysql --login-path=ognrange -e "select * from stations                where  station = '$1';"                                                ognrange
 mysql --login-path=ognrange -e "delete   from stationlocation         where  station     = (select id from stations where station = '$1'); " ognrange 

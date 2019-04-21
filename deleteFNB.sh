@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "Delete data from invalid stations"
 echo                           "select * from stations                where                                                station like '$1%' and active = '$2'; "       
 mysql --login-path=ognrange -e "select * from stations                where                                                station like '$1%' and active = '$2'; " ognrange
 mysql --login-path=ognrange -e "delete   from stationlocation         where  station     IN (select id from stations where station like '$1%' and active = '$2');" ognrange
