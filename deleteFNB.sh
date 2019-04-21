@@ -4,6 +4,7 @@ echo                           "select * from stations                where     
 mysql --login-path=ognrange -e "select * from stations                where                                                station like '$1%' and active = '$2'; " ognrange
 mysql --login-path=ognrange -e "delete   from stationlocation         where  station     IN (select id from stations where station like '$1%' and active = '$2');" ognrange
 mysql --login-path=ognrange -e "delete   from roughcoverage           where  station     IN (select id from stations where station like '$1%' and active = '$2');" ognrange
+mysql --login-path=ognrange -e "delete   from estimatedcoverage       where  station     IN (select id from stations where station like '$1%' and active = '$2');" ognrange
 mysql --login-path=ognrange -e "delete   from availability            where  station_id  IN (select id from stations where station like '$1%' and active = '$2');" ognrange
 mysql --login-path=ognrange -e "delete   from availability_log        where  station_id  IN (select id from stations where station like '$1%' and active = '$2');" ognrange
 mysql --login-path=ognrange -e "delete   from positions_mgrs          where  station     IN (select id from stations where station like '$1%' and active = '$2');" ognrange
