@@ -8,8 +8,11 @@ taken=$day"_"$DMY"_"$now
 
 {
 echo "Starting deleting zombie stations at: "$(date)
-cd /var/www/html/OGNRANGE
 date
+echo "Query number of active stations"
+mysql --login-path=ognrange <queryactivestations.sql
+echo "Query number of empty stations"
+mysql --login-path=ognrange <queryemptystations.sql
 #
 echo "Stop de OGNRANGE daemon, in order to improve performance"
 #
@@ -57,6 +60,10 @@ echo "deleting the data before January 2018"
 #
 #mysql --login-path=ognrange ognrange <config/deleteoldata.sql
 #
+date
+echo "Delete empty stations"
+mysql --login-path=ognrange <delemptystations.sql
+date
 echo "Check and delete stations with no location and data with no station in the ognrange database"
 #
 date
@@ -64,7 +71,9 @@ python delzombies.py
 date
 bash deloldstations.sh
 date
+echo "Delete record with station that do not exist anymore on the database"
 bash delzombies.sh
+date
 #
 echo "Check the ognrange database"
 #
@@ -83,10 +92,14 @@ bash countoldstations.sh
 date
 bash countzombies.sh
 date
+echo "Query number of active stations"
+mysql --login-path=ognrange <queryactivestations.sql
+echo "Query number of empty stations"
+mysql --login-path=ognrange <queryemptystations.sql
 #
 echo "Start de OGNRANGE daemon ..."
 #
 date
-} | mutt  -s $hn" REPOOGN OGNRANGE DB cleanup .... "$taken -- yourname@yourserver.com
+} | mutt  -s $hn" REPOOGN OGNRANGE DB cleanup .... "$taken -- yourname@yourserver.es
 bash /home/angel/src/OGNrangecheck.sh  &
 cd
