@@ -459,7 +459,7 @@ sub handleServer {
 		$name=substr($server, 0, 18);
 	}
 	$address = inet_ntoa(inet_aton($name));
-	print "\n>>>> reconnecting $server Server: $name is at IP: $address Date and Time: $nownow  $dmy $hms <<<<\n";
+	print "\n>>>> reconnecting $server Server: $name is at IP: $address Date and UTC Time: $nownow  $dmy $hms <<<<\n";
 	$is->disconnect() || print "Failed to disconnect: $is->{error}";
 	sleep(30);
     }
@@ -688,7 +688,7 @@ sub handleAvailablity {
 	if ($prt) {print "\n";}
 	if ($prt) {print "====> Number of down stations at: $now $nstdown <====\n";}
 	my $localtime = localtime();
-	print "====> Number of down stations at: $now $localtime $nstdown <====\n";
+	print "====> Number of down stations at: $now Local time: $localtime $nstdown <====\n";
 	
 	foreach my $station (@missing) {
 	    $station_previous_check{$station} = $station_current{$station};
