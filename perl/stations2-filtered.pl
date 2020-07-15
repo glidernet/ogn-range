@@ -55,6 +55,7 @@ if( param ) {
 
     my $start = param('start');
     my $end = param('end');
+    my $station = param('station') || '';
 
     if( ! $end || $end eq '' || ! $end =~ /20[0-3][0-9]-[0-1][0-9]-[0-1][0-9]/ ) {
 	$end = '2100-01-01';
@@ -62,6 +63,10 @@ if( param ) {
 
     if( ! $start || $start eq '' || ! $start =~ /20[0-3][0-9]-[0-1][0-9]-[0-1][0-9]/ ) {
 	$start = '2014-01-01';
+    }
+
+    if( ! ( $station =~ /^[A-Z0-9%_;]*$/i )) {
+	$station = '';
     }
 
     my $db = DBI->connect( $db_dsn, $db_username, $db_password );
@@ -78,10 +83,10 @@ if( param ) {
 
     $db->do(' set time_zone = "+00:00"');
     $db->do(' set session sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"');
-    my $sth_station    = $db->prepare(' select o.station,sl.lt,sl.lg,a.status, left(o.otime,16),o.active, version  from stations o left join availability a on o.id = a.station_id , stationlocation sl where  o.id = sl.station and sl.lt is not NULL  and o.otime > "2000-01-01" and  sl.time=(select max(i.time) from stationlocation i  where i.station=o.id and i.time between ? and ?)    group by o.station');
+    my $sth_station = $db->prepare(' select o.station,sl.lt,sl.lg,a.status, left(o.otime,16),o.active, version  from stations o left join availability a on o.id = a.station_id , stationlocation sl where (? = "" OR o.station = ?) and o.id = sl.station and sl.lt is not NULL  and o.otime > "2000-01-01" and  sl.time=(select max(i.time) from stationlocation i  where i.station=o.id and i.time between ? and ?)    group by o.station');
 
-    $sth_station->execute( $start, $end );
-	 
+    $sth_station->execute( $station, $station, $start, $end );
+
     print '{"stations":[';
     
     my $rows = []; # cache for batches of rows
