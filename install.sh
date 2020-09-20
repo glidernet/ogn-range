@@ -20,5 +20,6 @@ sudo chgrp www-data files/* perl/* index.html config/webconfig.json
 sudo chmod 775 files perl config
 mysql_config_editor set --login-path=ognrange --host=localhost --user=ognwriter --password
 #
-# change the URLon url.js and the webconfig/binconfig files
+# change the URL on: url.js and the webconfig/binconfig files
 #
+echo Done.
