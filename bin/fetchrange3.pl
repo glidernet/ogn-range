@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w                                                                                                                                                      
 
 # Copyright (c) 2014-2018, Melissa Jenkins
+# Modified by Angel Casado -2018-???
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -290,7 +291,7 @@ sub handleServer {
 	    print OUT $l."\n";
 
 	    
-	    if( $l =~ /^\s*#/ || $l eq '' ) {
+	    if( $l =~ /^\s*#/ || $l eq '' || substr ($l,0,3) eq 'FNT') {
 #		if ($prt) {print "\n$l\n";}
 		next;
 	    }

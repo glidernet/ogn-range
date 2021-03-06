@@ -7,7 +7,7 @@ sudo cpan    Math::Trig
 sudo cpan    FindBin
 sudo cpan    Geo::Coordinates::UTM
 sudo cpan    DateTime
-sudo cpan    sys::Host::Long
+sudo cpan    sys::Hostname::Long
 sudo cpan    JSON
 apt-get -y install libapache2-mod-perl2
 sudo a2enmod cache
