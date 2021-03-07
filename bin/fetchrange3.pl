@@ -57,7 +57,7 @@ use LatLngCoarse2;
 #
 
 my $prt=0;
-my $pgmversion = "0.4.1";
+my $pgmversion = "0.4.2";
 
 #
 # load the configuration file
@@ -117,11 +117,6 @@ my @servers = ( 'glidern1.glidernet.org:10153',
 		'glidern4.glidernet.org:10153', 
 		'glidern5.glidernet.org:10153', 
 		'aprs.glidernet.org:10152' );
-#		'glidern2.glidernet.org:10152');
-#		'aprs.glidernet.org:10152' );
-
-
-
 #
 #############
 #
