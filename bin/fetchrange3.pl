@@ -325,6 +325,8 @@ sub handleServer {
 				
 				my $lt = $packetdata{latitude};
 				my $lg = $packetdata{longitude};
+                                if ($lt > 80.0 || $lt < -80.0 || $lg > 180.0 || $lg < -180.0)
+                                   next;
 				my ($lt_r,$lg_r) = makeLocationCoarse( $lt, $lg, 1000 );
 				
 				$lt_r = int(($lt_r * 1000)+.5)/1000;
