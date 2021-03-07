@@ -57,7 +57,7 @@ use LatLngCoarse2;
 #
 
 my $prt=0;
-my $pgmversion = "0.4.1";
+my $pgmversion = "0.4.2";
 
 #
 # load the configuration file
@@ -117,11 +117,6 @@ my @servers = ( 'glidern1.glidernet.org:10153',
 		'glidern4.glidernet.org:10153', 
 		'glidern5.glidernet.org:10153', 
 		'aprs.glidernet.org:10152' );
-#		'glidern2.glidernet.org:10152');
-#		'aprs.glidernet.org:10152' );
-
-
-
 #
 #############
 #
@@ -325,8 +320,7 @@ sub handleServer {
 				
 				my $lt = $packetdata{latitude};
 				my $lg = $packetdata{longitude};
-                                if ($lt > 80.0 || $lt < -80.0 || $lg > 180.0 || $lg < -180.0)
-                                   next;
+                                next if ($lt > 80.0 || $lt < -80.0 || $lg > 180.0 || $lg < -180.0);
 				my ($lt_r,$lg_r) = makeLocationCoarse( $lt, $lg, 1000 );
 				
 				$lt_r = int(($lt_r * 1000)+.5)/1000;
