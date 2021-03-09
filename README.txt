@@ -1,5 +1,6 @@
 
 Copyright (c) 2014-2018, Melissa Jenkins
+Modified by Angel Casado 2019
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

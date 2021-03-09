@@ -152,7 +152,6 @@ my $ready_semaphore = Thread::Semaphore->new(100);
  
 while(1) {
     $ready_semaphore->down(100);
-    
     my $avail = threads->create( \&handleAvailablity );
     foreach my $server ( @servers ) {	
 	my $name="localhost";
@@ -222,6 +221,7 @@ sub handleServer {
     my $i = 0;
     my $lastkeepalive = time();
     my $today = date($lastkeepalive);
+    my $alive    = "/nfs/OGN/DIRdata/OGNRANGE.alive";
 
     while(1) {
 	$is->connect('retryuntil' => 10) || print "Failed to connect: $is->{error}";
@@ -244,6 +244,10 @@ sub handleServer {
 	    if( $now - $lastkeepalive > 60 ) {
 		$is->sendline('# ognrange.glidernet.org 51.254.32.187 ');
 		$lastkeepalive = $now;
+
+                open(my $alive_fh,">>", $alive) or die "Can not create ALIVE file";
+                print $alive_fh ">>>>>>> $now >>>>>>> $server >>>>>>>>>>>>>>";
+                close   ($alive_fh);
 	    }
 	    
 	    # check to make sure we emit the stations at least once a day
