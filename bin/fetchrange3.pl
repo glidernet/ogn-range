@@ -246,7 +246,7 @@ sub handleServer {
 		$lastkeepalive = $now;
 
                 open(my $alive_fh,">>", $alive) or die "Can not create ALIVE file";
-                print $alive_fh ">>>>>>> $now >>>>>>> $server >>>>>>>>>>>>>>";
+                print $alive_fh ">>>>>>> $now >>>>>>> $server >>>>>>>>>>>>>>\n";
                 close   ($alive_fh);
 	    }
 	    
