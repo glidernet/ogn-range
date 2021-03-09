@@ -244,9 +244,9 @@ sub handleServer {
 	    if( $now - $lastkeepalive > 60 ) {
 		$is->sendline('# ognrange.glidernet.org 51.254.32.187 ');
 		$lastkeepalive = $now;
-
+                my $datestring = localtime();
                 open(my $alive_fh,">>", $alive) or die "Can not create ALIVE file";
-                print $alive_fh ">>>>>>> $now >>>>>>> $server >>>>>>>>>>>>>>\n";
+                print $alive_fh ">>>>>>> $now >>>>>>> $server >>>>>>> $datestring >>>>>>>\n";
                 close   ($alive_fh);
 	    }
 	    
