@@ -1,5 +1,4 @@
-drop   database ognrange;
-create database ognrange;
+create database if not exists ognrange;
 use ognrange;
 source OGNrange.sql ;
 create user ognrange@localhost identified by 'aksdkqre912eqwkadkad';
