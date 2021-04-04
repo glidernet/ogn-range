@@ -10,9 +10,9 @@ taken=$day"_"$DMY"_"$now
 echo "Starting deleting zombie stations at: "$(date)
 date
 echo "Query number of active stations"
-mysql --login-path=ognrange <queryactivestations.sql
+sudo mysql  <queryactivestations.sql
 echo "Query number of empty stations"
-mysql --login-path=ognrange <queryemptystations.sql
+sudo mysql  <queryemptystations.sql
 #
 echo "Stop de OGNRANGE daemon, in order to improve performance"
 #
@@ -58,11 +58,11 @@ bash deleteFNB.sh      TEST     Y
 #
 echo "deleting the data before January 2018"
 #
-#mysql --login-path=ognrange ognrange <config/deleteoldata.sql
+#mysql  ognrange <config/deleteoldata.sql
 #
 date
 echo "Delete empty stations"
-mysql --login-path=ognrange <delemptystations.sql
+sudo mysql  <delemptystations.sql
 date
 echo "Check and delete stations with no location and data with no station in the ognrange database"
 #
@@ -78,12 +78,12 @@ date
 echo "Check the ognrange database"
 #
 date
-mysql        --login-path=ognrange -e "reset query cache;"           ognrange
-mysqlcheck   --login-path=ognrange                                   ognrange
-mysql        --login-path=ognrange -e "reset query cache;"           ognrange
+sudo mysql         -e "reset query cache;"           ognrange
+sudo mysqlcheck                                      ognrange
+sudo mysql         -e "reset query cache;"           ognrange
 date
 echo "Optimize the ognrange database"
-mysqlcheck   --login-path=ognrange --optimize --skip-write-binlog    ognrange
+sudo mysqlcheck    --optimize --skip-write-binlog    ognrange
 #
 echo "Count now the number of zombie stations"
 #
@@ -93,9 +93,9 @@ date
 bash countzombies.sh
 date
 echo "Query number of active stations"
-mysql --login-path=ognrange <queryactivestations.sql
+sudo mysql  <queryactivestations.sql
 echo "Query number of empty stations"
-mysql --login-path=ognrange <queryemptystations.sql
+mysql  <queryemptystations.sql
 #
 echo "Start de OGNRANGE daemon ..."
 #
