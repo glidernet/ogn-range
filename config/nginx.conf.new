@@ -1,0 +1,42 @@
+server {
+	listen 80;
+	listen [::]:80;
+	server_name ognrange.glidernet.org;
+	return 301 https://$host$request_uri;
+}
+server {
+        listen [::]:443 ssl;
+        listen 443 ssl;
+        ssl_certificate /etc/letsencrypt/live/ognrange.glidernet.org/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/ognrange.glidernet.org/privkey.pem;
+
+	root /var/www/ognrange.glidernet.org/html;
+
+	index index.php index.html index.htm index.nginx-debian.html;
+
+	server_name ognrange.glidernet.org;
+
+	location / {
+		# First attempt to serve request as file, then
+		# as directory, then fall back to displaying a 404.
+		try_files $uri $uri/ =404;
+	}
+
+        # pass the Perl scripts to FastCGI server listening on 127.0.0.1:8999
+        #
+        location ~ /perl/.*\.pl$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/var/run/fcgiwrap.socket;
+                fastcgi_param RANGEPATH /var/www/ognrange.glidernet.org/html;
+        }
+        # Protect Perl files to prevent download of the code
+        location ~ \.pl$ {
+                return 403;
+        }
+
+        # Protect directory
+        location /config {
+                return 403;
+        }
+}
+
