@@ -1,6 +1,7 @@
 config/webconfig.json
 config/binconfig.json
 config/ognconfig.json
+config/OGNrange.sql
 files/url.js
 config/url.js
 delstations.sh
