@@ -32,6 +32,7 @@ bash deletephantoms.sh SPOT
 bash deletephantoms.sh SPIDER
 bash deletephantoms.sh INREACH
 bash deletephantoms.sh SKYLINES
+bash deletephantoms.sh SkySafe
 bash deletephantoms.sh LT24
 bash deletephantoms.sh CAPTURS
 bash deletephantoms.sh RELAY
@@ -51,6 +52,7 @@ bash deleteFNB.sh      XCC      Y
 bash deleteFNB.sh      OGN      Y
 bash deleteFNB.sh      ICA      Y
 bash deleteFNB.sh      FLR      Y
+bash deleteFNB.sh      SKY      Y
 bash deleteFNB.sh      bSkyN    Y
 bash deleteFNB.sh      AIRS     Y
 bash deleteFNB.sh      AIRS-    Y
@@ -67,7 +69,7 @@ date
 echo "Check and delete stations with no location and data with no station in the ognrange database"
 #
 date
-python delzombies.py
+python3 delzombies.py
 date
 bash deloldstations.sh
 date

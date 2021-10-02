@@ -32,6 +32,7 @@ bash deletephantoms.sh SPOT
 bash deletephantoms.sh SPIDER
 bash deletephantoms.sh INREACH
 bash deletephantoms.sh SKYLINES
+bash deletephantoms.sh SAFESKIES
 bash deletephantoms.sh LT24
 bash deletephantoms.sh CAPTURS
 bash deletephantoms.sh RELAY
