@@ -6,3 +6,4 @@ files/url.js
 config/url.js
 delstations.sh
 *~
+.my.cnf

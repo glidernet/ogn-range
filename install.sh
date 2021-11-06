@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo apt install cpanminus
 sudo cpan -f Ham::APRS::IS
 sudo cpan -f Ham::APRS::FAP 
 sudo cpan    DBI
@@ -7,7 +8,8 @@ sudo cpan    Math::Trig
 sudo cpan    FindBin
 sudo cpan    Geo::Coordinates::UTM
 sudo cpan    DateTime
-sudo cpan    sys::Hostname::Long
+#sudo cpan    sys::Hostname::Long
+sudo cpanm Sys::Hostname::Long
 sudo cpan    JSON
 if [ $1 = 'APACHE2' ]
 then 
@@ -25,7 +27,6 @@ sudo chown -R ognrange:adm .
 sudo chmod -R 771 .
 sudo chgrp www-data files/* perl/* index.html config/webconfig.json
 sudo chmod 775 files perl config
-#mysql_config_editor set --login-path=ognrange --host=localhost --user=ognwriter --password
 #
 # change the URL on: url.js and the webconfig/binconfig files
 #
