@@ -119,5 +119,5 @@ echo "Start de OGNRANGE daemon ..."
 #
 date
 } | mutt  -s $hn" REPOOGN OGNRANGE DB cleanup .... "$taken -- yourname@yourserver.es
-bash /home/angel/src/OGNrangecheck.sh  &
+bash ~/src/OGNrangecheck.sh  &
 cd
