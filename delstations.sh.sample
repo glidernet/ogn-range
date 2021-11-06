@@ -29,19 +29,33 @@ date
 bash deletephantoms.sh NAVITER
 bash deletephantoms.sh FLYMASTER
 bash deletephantoms.sh SPOT
+bash deletephantoms.sh notSPOT
 bash deletephantoms.sh SPIDER
 bash deletephantoms.sh INREACH
+bash deletephantoms.sh Inreach
 bash deletephantoms.sh SKYLINES
 bash deletephantoms.sh SafeSky
 bash deletephantoms.sh LT24
 bash deletephantoms.sh CAPTURS
 bash deletephantoms.sh RELAY
 bash deletephantoms.sh "0"
+bash deletephantoms.sh NONE
 bash deletephantoms.sh Test
 bash deletephantoms.sh N0CALL
 bash deletephantoms.sh Home
 bash deletephantoms.sh MyStation
 bash deletephantoms.sh abcde
+bash deletephantoms.sh NEMO
+bash deletephantoms.sh Android
+bash deletephantoms.sh TTN2OGN
+bash deletephantoms.sh TTN3OGN
+bash deletephantoms.sh Heliu2OGN
+bash deletephantoms.sh OBS2OGN
+bash deletephantoms.sh APRSPUSH
+bash deletephantoms.sh DLY2APRS
+bash deletephantoms.sh IGCDroid
+###################################
+
 #
 echo "Deleting the pseudo STATIONS"
 #
@@ -57,6 +71,7 @@ bash deleteFNB.sh      bSkyN    Y
 bash deleteFNB.sh      AIRS     Y
 bash deleteFNB.sh      AIRS-    Y
 bash deleteFNB.sh      TEST     Y
+bash deleteFNB.sh      SKYS     Y
 #
 echo "deleting the data before January 2018"
 #
@@ -64,6 +79,7 @@ echo "deleting the data before January 2018"
 #
 date
 echo "Delete empty stations"
+mysql -e "delete from stations where otime = '1970-01-01';" ognrange
 sudo mysql  <delemptystations.sql
 date
 echo "Check and delete stations with no location and data with no station in the ognrange database"
