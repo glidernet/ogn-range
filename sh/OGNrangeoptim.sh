@@ -27,6 +27,7 @@ echo "Deleting the phantom STATIONS"
 #
 date
 bash deletephantoms.sh NAVITER
+bash deletephantoms.sh NAVITER
 bash deletephantoms.sh FLYMASTER
 bash deletephantoms.sh SPOT
 bash deletephantoms.sh notSPOT
@@ -72,6 +73,7 @@ bash deleteFNB.sh      AIRS     Y
 bash deleteFNB.sh      AIRS-    Y
 bash deleteFNB.sh      TEST     Y
 bash deleteFNB.sh      SKYS     Y
+bash deleteFNB.sh      ADSB     Y
 #
 echo "deleting the data before January 2018"
 #
