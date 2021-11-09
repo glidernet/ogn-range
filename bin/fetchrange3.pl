@@ -469,7 +469,7 @@ sub handleServer {
 sub getStation {
     my($sth_add,$sth_history,$sth_supdate,$station) = @_;
     my $s_id = undef;
-    if ($station eq 'SPOT' || $station eq 'SPIDER' || $station eq 'INREACH' || $station eq 'Inreach' || $station eq "FLYMASTER" || $station eq 'NAVITER' || $station eq 'CAPTURS' || $station eq 'LT24' || $station eq 'SKYLINES' || $station eq 'NEMO'|| $station eq 'Android'|| $station eq 'SafeSky'|| $station eq 'IGCDroid'|| $station eq 'APRSPUSH'|| $station eq 'DLY2APRS' || $station eq 'TTN2OGN' || $station eq 'TTN3OGN' || $station eq 'OBS2OGN' || $station eq 'Heliu2OGN' || $station eq 'ADSB' ) {
+    if ($station eq 'SPOT' || $station eq 'SPIDER' || $station eq 'INREACH' || $station eq 'Inreach' || $station eq "FLYMASTER" || $station eq 'NAVITER' || $station eq 'CAPTURS' || $station eq 'LT24' || $station eq 'SKYLINES' || $station eq 'NEMO'|| $station eq 'Android'|| $station eq 'SafeSky'|| $station eq 'IGCDroid'|| $station eq 'APRSPUSH'|| $station eq 'DLY2APRS' || $station eq 'TTN2OGN' || $station eq 'TTN3OGN' || $station eq 'OBS2OGN' || $station eq 'Heliu2OGN' || $station eq 'ADSB' || $station eq 'Microtrack'|| $station eq 'GIGA01'|| $station eq 'UNSET'|| $station eq 'PWUNSET'|| $station eq 'GLIDERNA' ) {
 	return 0;
     }
 
