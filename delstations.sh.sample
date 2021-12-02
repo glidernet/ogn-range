@@ -13,10 +13,17 @@ echo "Query number of active stations"
 sudo mysql  <queryactivestations.sql
 echo "Query number of empty stations"
 sudo mysql  <queryemptystations.sql
+if [ -f /tmp/OGNrangeoptim.pid]
+then
+      echo "Other OGNRANGE optim process runninng .... "$(cat /tmp/OGNrangeoptim.pid)" if not, delete the /tmp/OGNrangeoptim.pid file"
+      exit
+fi
 #
 echo "Stop de OGNRANGE daemon, in order to improve performance"
 #
 killall perl
+# set a mark in order to protect running other process
+echo $$ >/tmp/OGNrangeoptim.pid
 #
 echo "Count first the number of zombie stations"
 #
@@ -55,7 +62,7 @@ bash deletephantoms.sh OBS2OGN
 bash deletephantoms.sh APRSPUSH
 bash deletephantoms.sh DLY2APRS
 bash deletephantoms.sh IGCDroid
-ash deletephantoms.sh Microtrack
+bash deletephantoms.sh Microtrack
 bash deletephantoms.sh GIGA01
 bash deletephantoms.sh UNSET
 bash deletephantoms.sh PWUNSET
@@ -94,8 +101,8 @@ echo "Check and delete stations with no location and data with no station in the
 date
 python delzombies.py
 date
-bash deloldstations.sh
-date
+#bash deloldstations.sh
+#date
 echo "Delete record with station that do not exist anymore on the database"
 bash delzombies.sh
 date
@@ -124,6 +131,8 @@ mysql  <queryemptystations.sql
 #
 echo "Start de OGNRANGE daemon ..."
 #
+# remove the mark that this process is running
+rm /tmp/OGNrangeoptim
 date
 } | mutt  -s $hn" REPOOGN OGNRANGE DB cleanup .... "$taken -- yourname@yourserver.es
 bash ~/src/OGNrangecheck.sh  &
