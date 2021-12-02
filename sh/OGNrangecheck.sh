@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ -f /tmp/OGNrangeoptim ]
+if [ -f /tmp/OGNrangeoptim.pid ]
 then
     logger -t $0 "OGNrange optimization in progress ..."
     exit

@@ -132,7 +132,7 @@ mysql  <queryemptystations.sql
 echo "Start de OGNRANGE daemon ..."
 #
 # remove the mark that this process is running
-rm /tmp/OGNrangeoptim
+rm /tmp/OGNrangeoptim.pid
 date
 } | mutt  -s $hn" REPOOGN OGNRANGE DB cleanup .... "$taken -- yourname@yourserver.es
 bash ~/src/OGNrangecheck.sh  &
