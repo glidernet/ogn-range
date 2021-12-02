@@ -55,6 +55,11 @@ bash deletephantoms.sh OBS2OGN
 bash deletephantoms.sh APRSPUSH
 bash deletephantoms.sh DLY2APRS
 bash deletephantoms.sh IGCDroid
+ash deletephantoms.sh Microtrack
+bash deletephantoms.sh GIGA01
+bash deletephantoms.sh UNSET
+bash deletephantoms.sh PWUNSET
+bash deletephantoms.sh GLIDERNA
 ###################################
 
 #
