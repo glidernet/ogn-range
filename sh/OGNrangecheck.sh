@@ -1,4 +1,9 @@
 #!/bin/bash
+if [ -f /tmp/OGNrangeoptim.pid ]
+then
+    logger -t $0 "OGNrange optimization in progress ..."
+    exit
+fi
 pnum=$(pgrep -x -f "perl fetchrange3.pl")
 if [ $? -eq 0 ] # if OGN repo interface is  not running
 then
