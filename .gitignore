@@ -4,6 +4,6 @@ config/ognconfig.json
 config/OGNrange.sql
 files/url.js
 config/url.js
-delstations.sh
+sh/OGNoptim.sh
 *~
 .my.cnf

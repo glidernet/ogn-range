@@ -1,18 +1,18 @@
 #!/bin/bash
-cd /var/www/html/OGNRANGE
 day=`date "+%a"`
 DMY=`date "+%x"`
 now=`date "+%R"`
 hn=`hostname   `
 taken=$day"_"$DMY"_"$now
-
-{
+echo "Start optimization of the OGNRANGE DB deleting old data"
+echo "======================================================="
 echo "Starting deleting zombie stations at: "$(date)
 date
 echo "Query number of active stations"
-sudo mysql  <queryactivestations.sql
+mysql  <queryactivestations.sql
 echo "Query number of empty stations"
-sudo mysql  <queryemptystations.sql
+mysql  <queryemptystations.sql
+#
 if [ -f /tmp/OGNrangeoptim.pid]
 then
       echo "Other OGNRANGE optim process runninng .... "$(cat /tmp/OGNrangeoptim.pid)" if not, delete the /tmp/OGNrangeoptim.pid file"
@@ -22,7 +22,6 @@ fi
 echo "Stop de OGNRANGE daemon, in order to improve performance"
 #
 killall perl
-# set a mark in order to protect running other process
 echo $$ >/tmp/OGNrangeoptim.pid
 #
 echo "Count first the number of zombie stations"
@@ -33,8 +32,9 @@ bash countzombies.sh
 echo "Deleting the phantom STATIONS"
 #
 date
+###################################
 bash deletephantoms.sh NAVITER
-bash deletephantoms.sh NAVITER
+bash deletephantoms.sh ADSB
 bash deletephantoms.sh FLYMASTER
 bash deletephantoms.sh SPOT
 bash deletephantoms.sh notSPOT
@@ -68,7 +68,6 @@ bash deletephantoms.sh UNSET
 bash deletephantoms.sh PWUNSET
 bash deletephantoms.sh GLIDERNA
 ###################################
-
 #
 echo "Deleting the pseudo STATIONS"
 #
@@ -93,16 +92,15 @@ echo "deleting the data before January 2018"
 #
 date
 echo "Delete empty stations"
+mysql  <delemptystations.sql
 mysql -e "delete from stations where otime = '1970-01-01';" ognrange
-sudo mysql  <delemptystations.sql
+mysql -e "delete from stats where station = 0 ;"            ognrange
 date
 echo "Check and delete stations with no location and data with no station in the ognrange database"
 #
 date
 python delzombies.py
 date
-#bash deloldstations.sh
-#date
 echo "Delete record with station that do not exist anymore on the database"
 bash delzombies.sh
 date
@@ -110,12 +108,12 @@ date
 echo "Check the ognrange database"
 #
 date
-sudo mysql         -e "reset query cache;"           ognrange
-sudo mysqlcheck                                      ognrange
-sudo mysql         -e "reset query cache;"           ognrange
+mysql         -e "reset query cache;"           ognrange
+mysqlcheck                                      ognrange
+mysql         -e "reset query cache;"           ognrange
 date
 echo "Optimize the ognrange database"
-sudo mysqlcheck    --optimize --skip-write-binlog    ognrange
+mysqlcheck    --optimize --skip-write-binlog    ognrange
 #
 echo "Count now the number of zombie stations"
 #
@@ -125,15 +123,13 @@ date
 bash countzombies.sh
 date
 echo "Query number of active stations"
-sudo mysql  <queryactivestations.sql
+mysql  <queryactivestations.sql
 echo "Query number of empty stations"
 mysql  <queryemptystations.sql
 #
 echo "Start de OGNRANGE daemon ..."
 #
-# remove the mark that this process is running
-rm /tmp/OGNrangeoptim.pid
+# remove the mark that this process is running 
+rm /tmp/OGNrangeoptim.pid			 
 date
-} | mutt  -s $hn" REPOOGN OGNRANGE DB cleanup .... "$taken -- yourname@yourserver.es
-bash ~/src/OGNrangecheck.sh  &
 cd

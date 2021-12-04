@@ -1,7 +1,7 @@
 #!/bin/bash
 if [ -f /tmp/OGNrangeoptim.pid ]
 then
-    logger -t $0 "OGNrange optimization in progress ..."
+    logger -t $0 "OGNrange optimization in progress ... "$(cat /tmp/OGNrangeoptim.pid) 
     exit
 fi
 pnum=$(pgrep -x -f "perl fetchrange3.pl")
