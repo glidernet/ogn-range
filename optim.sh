@@ -86,8 +86,6 @@ bash deleteFNB.sh      TEST     Y
 bash deleteFNB.sh      SKYS     Y
 bash deleteFNB.sh      ADSB     Y
 #
-echo "deleting the data before January 2018"
-#
 #mysql  ognrange <config/deleteoldata.sql
 #
 date
@@ -96,6 +94,14 @@ mysql  <delemptystations.sql
 mysql -e "delete from stations where otime = '1970-01-01';" ognrange
 mysql -e "delete from stats where station = 0 ;"            ognrange
 date
+echo "deleting the data before January 2022"
+mysql -e "delete from stations         where otime < '2022-01-01';" ognrange
+mysql -e "delete from history          where time  < '2022-01-01';" ognrange
+mysql -e "delete from stationlocation  where time  < '2022-01-01';" ognrange
+mysql -e "delete from stats            where time  < '2022-01-01';" ognrange
+mysql -e "delete from positions_mgrs   where time  < '2022-01-01';" ognrange
+date
+#
 echo "Check and delete stations with no location and data with no station in the ognrange database"
 #
 date
@@ -113,7 +119,7 @@ mysqlcheck                                      ognrange
 mysql         -e "reset query cache;"           ognrange
 date
 echo "Optimize the ognrange database"
-mysqlcheck    --optimize --skip-write-binlog    ognrange
+mysqlcheck    --optimize --skip-write-binlog    ognrange availability  availability_log estimatedcoverage gliders history roughcoverage stationlocation stations stats statssummary
 #
 echo "Count now the number of zombie stations"
 #
