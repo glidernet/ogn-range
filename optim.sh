@@ -13,7 +13,7 @@ mysql  <queryactivestations.sql
 echo "Query number of empty stations"
 mysql  <queryemptystations.sql
 #
-if [ -f /tmp/OGNrangeoptim.pid]
+if [ -f /tmp/OGNrangeoptim.pid ]
 then
       echo "Other OGNRANGE optim process runninng .... "$(cat /tmp/OGNrangeoptim.pid)" if not, delete the /tmp/OGNrangeoptim.pid file"
       exit
@@ -22,7 +22,11 @@ fi
 echo "Stop de OGNRANGE daemon, in order to improve performance"
 #
 killall perl
-echo $$ >/tmp/OGNrangeoptim.pid
+echo $$ > /tmp/OGNrangeoptim.pid
+if [ ! -f /tmp/OGNrangeoptim.pid ]
+then
+    touch /tmp/OGNrangeoptim.pid
+fi
 #
 echo "Count first the number of zombie stations"
 #
