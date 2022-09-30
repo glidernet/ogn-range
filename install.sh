@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo apt install cpanminus
+sudo apt install -y cpanminus
 sudo cpan -f Ham::APRS::IS
 sudo cpan -f Ham::APRS::FAP 
 sudo cpan    DBI
@@ -24,7 +24,7 @@ echo "Creating user ognrange"
 echo "======================"
 sudo adduser ognrange
 sudo chown -R ognrange:adm .
-sudo chmod -R 771 .
+sudo chmod -R 775 .
 sudo chgrp www-data files/* perl/* index.html config/webconfig.json
 sudo chmod 775 files perl config
 #
