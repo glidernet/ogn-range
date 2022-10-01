@@ -21,7 +21,8 @@ fi
 #
 echo "Stop de OGNRANGE daemon, in order to improve performance"
 #
-killall perl
+killall perl >/dev/null 2>&1
+#
 echo $$ > /tmp/OGNrangeoptim.pid
 if [ ! -f /tmp/OGNrangeoptim.pid ]
 then
@@ -136,10 +137,10 @@ echo "Query number of active stations"
 mysql  <queryactivestations.sql
 echo "Query number of empty stations"
 mysql  <queryemptystations.sql
-#
-echo "Start de OGNRANGE daemon ..."
-#
 # remove the mark that this process is running 
 rm /tmp/OGNrangeoptim.pid			 
+#
+echo "Start now the OGNRANGE daemon ..."
+#
 date
 cd
