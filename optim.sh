@@ -13,7 +13,7 @@ mysql  <queryactivestations.sql
 echo "Query number of empty stations"
 mysql  <queryemptystations.sql
 #
-if [ -f /tmp/OGNrangeoptim.pid]
+if [ -f /tmp/OGNrangeoptim.pid ]
 then
       echo "Other OGNRANGE optim process runninng .... "$(cat /tmp/OGNrangeoptim.pid)" if not, delete the /tmp/OGNrangeoptim.pid file"
       exit
@@ -21,8 +21,13 @@ fi
 #
 echo "Stop de OGNRANGE daemon, in order to improve performance"
 #
-killall perl
-echo $$ >/tmp/OGNrangeoptim.pid
+killall perl >/dev/null 2>&1
+#
+echo $$ > /tmp/OGNrangeoptim.pid
+if [ ! -f /tmp/OGNrangeoptim.pid ]
+then
+    touch /tmp/OGNrangeoptim.pid
+fi
 #
 echo "Count first the number of zombie stations"
 #
@@ -86,8 +91,6 @@ bash deleteFNB.sh      TEST     Y
 bash deleteFNB.sh      SKYS     Y
 bash deleteFNB.sh      ADSB     Y
 #
-echo "deleting the data before January 2018"
-#
 #mysql  ognrange <config/deleteoldata.sql
 #
 date
@@ -96,6 +99,14 @@ mysql  <delemptystations.sql
 mysql -e "delete from stations where otime = '1970-01-01';" ognrange
 mysql -e "delete from stats where station = 0 ;"            ognrange
 date
+echo "deleting the data before January 2022"
+mysql -e "delete from stations         where otime < '2022-01-01';" ognrange
+mysql -e "delete from history          where time  < '2022-01-01';" ognrange
+mysql -e "delete from stationlocation  where time  < '2022-01-01';" ognrange
+mysql -e "delete from stats            where time  < '2022-01-01';" ognrange
+mysql -e "delete from positions_mgrs   where time  < '2022-01-01';" ognrange
+date
+#
 echo "Check and delete stations with no location and data with no station in the ognrange database"
 #
 date
@@ -113,7 +124,7 @@ mysqlcheck                                      ognrange
 mysql         -e "reset query cache;"           ognrange
 date
 echo "Optimize the ognrange database"
-mysqlcheck    --optimize --skip-write-binlog    ognrange
+mysqlcheck    --optimize --skip-write-binlog    ognrange availability  availability_log estimatedcoverage gliders history roughcoverage stationlocation stations stats statssummary
 #
 echo "Count now the number of zombie stations"
 #
@@ -126,10 +137,10 @@ echo "Query number of active stations"
 mysql  <queryactivestations.sql
 echo "Query number of empty stations"
 mysql  <queryemptystations.sql
-#
-echo "Start de OGNRANGE daemon ..."
-#
 # remove the mark that this process is running 
 rm /tmp/OGNrangeoptim.pid			 
+#
+echo "Start now the OGNRANGE daemon ..."
+#
 date
 cd

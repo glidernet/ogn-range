@@ -74,7 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  flush privileges;
 
-
+ and install python mysqldb module using the command:        sudo apt-get install python3-mysqldb
 
 #
 # Finally, the bin/fetchrange3.pl script will connect to the APRS servers and update the database
