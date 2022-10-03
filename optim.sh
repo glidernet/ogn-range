@@ -110,7 +110,7 @@ date
 echo "Check and delete stations with no location and data with no station in the ognrange database"
 #
 date
-python delzombies.py
+/usr/bin/python delzombies.py
 date
 echo "Delete record with station that do not exist anymore on the database"
 bash delzombies.sh
