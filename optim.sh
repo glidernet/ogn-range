@@ -138,7 +138,7 @@ mysql  <queryactivestations.sql
 echo "Query number of empty stations"
 mysql  <queryemptystations.sql
 # remove the mark that this process is running 
-rm /tmp/OGNrangeoptim.pid			 
+rm /tmp/OGNrangeoptim.pid >/dev/null 2>&1			 
 #
 echo "Start now the OGNRANGE daemon ..."
 #
